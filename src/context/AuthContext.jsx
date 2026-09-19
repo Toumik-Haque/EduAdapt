@@ -30,6 +30,7 @@ export const AuthProvider = ({ children }) => {
     }
 
     localStorage.setItem('token', loginData.token)
+
     localStorage.setItem(
       'user',
       JSON.stringify(currentUser)
@@ -37,6 +38,30 @@ export const AuthProvider = ({ children }) => {
 
     setToken(loginData.token)
     setUser(currentUser)
+  }
+
+  // Update profile in frontend state
+  const updateProfile = (updatedProfile) => {
+    setUser(currentUser => {
+      if (!currentUser) {
+        return currentUser
+      }
+
+      const updatedUser = {
+        ...currentUser,
+        profile: {
+          ...currentUser.profile,
+          ...updatedProfile
+        }
+      }
+
+      localStorage.setItem(
+        'user',
+        JSON.stringify(updatedUser)
+      )
+
+      return updatedUser
+    })
   }
 
   // Logout
@@ -99,7 +124,8 @@ export const AuthProvider = ({ children }) => {
         isAuthenticated,
         loading,
         login,
-        logout
+        logout,
+        updateProfile
       }}
     >
       {children}
@@ -110,3 +136,4 @@ export const AuthProvider = ({ children }) => {
 export const useAuth = () => {
   return useContext(AuthContext)
 }
+

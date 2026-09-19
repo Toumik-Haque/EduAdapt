@@ -3,6 +3,9 @@ import Navbar from '../components/Navbar/Navbar'
 import Home from '../pages/Home/Home'
 import Register from '../pages/Register/Register'
 import Login from '../pages/Login/Login'
+import InstitutePublicProfile from '../pages/InstitutePublic/InstitutePublicProfile'
+
+import Profile from '../pages/Profile/Profile'
 
 import Learner from '../pages/Learner/Learner'
 import IndividualLearning from '../pages/IndividualLearning/IndividualLearning'
@@ -10,7 +13,11 @@ import InstitutionLearning from '../pages/InstitutionLearning/InstitutionLearnin
 import JoinInstitution from '../pages/JoinInstitution/JoinInstitution'
 
 import Teacher from '../pages/Teacher/Teacher'
+import TeacherIndividual from '../pages/TeacherIndividual/TeacherIndividual'
+import TeacherInstitution from '../pages/TeacherInstitution/TeacherInstitution'
+
 import Institute from '../pages/Institute/Institute'
+import InstituteProfileEdit from '../pages/Institute/InstituteProfileEdit'
 
 import ProtectedRoute from './ProtectedRoute'
 import PublicOnlyRoute from './PublicOnlyRoute'
@@ -52,6 +59,14 @@ function AppRoutes() {
           }
         />
         <Route
+          path="/learner/profile"
+          element={
+            <ProtectedRoute allowedAccountType="learner">
+              <Profile />
+            </ProtectedRoute>
+          }
+        />
+        <Route
           path="/learner/individual"
           element={
             <ProtectedRoute allowedAccountType="learner">
@@ -68,7 +83,7 @@ function AppRoutes() {
           }
         />
         <Route
-          path="/learner/institution"
+          path="/learner/institutions"
           element={
             <ProtectedRoute allowedAccountType="learner">
               <JoinInstitution />
@@ -84,6 +99,38 @@ function AppRoutes() {
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/teacher/profile"
+          element={
+            <ProtectedRoute allowedAccountType="teacher">
+              <Profile />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/teacher/individual"
+          element={
+            <ProtectedRoute allowedRoles={['teacher']}>
+              <TeacherIndividual />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/teacher/institute/:instituteId"
+          element={
+            <ProtectedRoute allowedRoles={['teacher']}>
+              <TeacherInstitution />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/teacher/join-institute"
+          element={
+            <ProtectedRoute allowedAccountType="teacher">
+              <JoinInstitution />
+            </ProtectedRoute>
+          }
+        />
 
         <Route
           path="/institute"
@@ -92,6 +139,26 @@ function AppRoutes() {
               <Institute />
             </ProtectedRoute>
           }
+        />
+        {/* <Route
+          path="/institute/profile"
+          element={
+            <ProtectedRoute allowedAccountType="institute">
+              <Profile />
+            </ProtectedRoute>
+          }
+        /> */}
+        <Route
+          path="/institute/profile"
+          element={
+            <ProtectedRoute allowedRoles={['institute']}>
+              <InstituteProfileEdit />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/institutions/:instituteId"
+          element={<InstitutePublicProfile />}
         />
 
       </Routes>

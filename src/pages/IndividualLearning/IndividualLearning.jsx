@@ -1,6 +1,11 @@
+import SpaceSwitcher from '../../components/SpaceSwitcher/SpaceSwitcher'
+
 function IndividualLearning() {
   return (
     <div className="container py-5">
+
+      <SpaceSwitcher />
+
       <h1 className="fw-bold">
         Individual Learning
       </h1>
@@ -8,6 +13,7 @@ function IndividualLearning() {
       <p className="text-muted">
         Your personalized learning space in EduAdapt.
       </p>
+
     </div>
   )
 }

@@ -273,8 +273,165 @@ const getCurrentUser = async (req, res) => {
   }
 }
 
+const getMyProfile = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.userId)
+      .select('email accountType')
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      })
+    }
+
+    let profile = null
+
+    if (user.accountType === 'learner') {
+      profile = await LearnerProfile.findOne({
+        userId: user._id
+      })
+    }
+
+    if (user.accountType === 'teacher') {
+      profile = await TeacherProfile.findOne({
+        userId: user._id
+      })
+    }
+
+    if (user.accountType === 'institute') {
+      profile = await InstituteProfile.findOne({
+        userId: user._id
+      })
+    }
+
+    if (!profile) {
+      return res.status(404).json({
+        success: false,
+        message: 'Profile not found'
+      })
+    }
+
+    res.status(200).json({
+      success: true,
+      user: {
+        id: user._id,
+        email: user.email,
+        accountType: user.accountType
+      },
+      profile
+    })
+  } catch (error) {
+    console.error('Get profile error:', error)
+
+    res.status(500).json({
+      success: false,
+      message: 'Server error while fetching profile'
+    })
+  }
+}
+
+
+const updateMyProfile = async (req, res) => {
+  try {
+    const { name, instituteType } = req.body
+
+    if (!name || !name.trim()) {
+      return res.status(400).json({
+        success: false,
+        message: 'Name is required'
+      })
+    }
+
+    const trimmedName = name.trim()
+
+    if (trimmedName.length < 2) {
+      return res.status(400).json({
+        success: false,
+        message: 'Name must be at least 2 characters'
+      })
+    }
+
+    const user = await User.findById(req.user.userId)
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      })
+    }
+
+    let profile = null
+
+    if (user.accountType === 'learner') {
+      profile = await LearnerProfile.findOneAndUpdate(
+        { userId: user._id },
+        { fullName: trimmedName },
+        {
+          new: true,
+          runValidators: true
+        }
+      )
+    }
+
+    if (user.accountType === 'teacher') {
+      profile = await TeacherProfile.findOneAndUpdate(
+        { userId: user._id },
+        { fullName: trimmedName },
+        {
+          new: true,
+          runValidators: true
+        }
+      )
+    }
+
+    if (user.accountType === 'institute') {
+      if (!instituteType) {
+        return res.status(400).json({
+          success: false,
+          message: 'Institute type is required'
+        })
+      }
+
+      profile = await InstituteProfile.findOneAndUpdate(
+        { userId: user._id },
+        {
+          instituteName: trimmedName,
+          instituteType
+        },
+        {
+          new: true,
+          runValidators: true
+        }
+      )
+    }
+
+    if (!profile) {
+      return res.status(404).json({
+        success: false,
+        message: 'Profile not found'
+      })
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Profile updated successfully',
+      profile
+    })
+  } catch (error) {
+    console.error('Update profile error:', error)
+
+    res.status(500).json({
+      success: false,
+      message: 'Server error while updating profile'
+    })
+  }
+}
+
 module.exports = {
   registerUser,
   loginUser,
-  getCurrentUser
+  getCurrentUser,
+  getMyProfile,
+  updateMyProfile
 }

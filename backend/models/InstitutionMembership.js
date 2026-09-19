@@ -14,6 +14,12 @@ const institutionMembershipSchema = new mongoose.Schema(
       required: true
     },
 
+    batchId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Batch',
+      default: null
+    },
+
     role: {
       type: String,
       required: true,
@@ -42,7 +48,8 @@ const institutionMembershipSchema = new mongoose.Schema(
 institutionMembershipSchema.index(
   {
     userId: 1,
-    institutionId: 1
+    institutionId: 1,
+    batchId: 1
   },
   {
     unique: true

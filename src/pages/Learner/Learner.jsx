@@ -59,11 +59,10 @@ function Learner() {
 
       <div className="container py-4 px-3">
 
-        {/* ================= HEADER ================= */}
-        <div className="col-lg-8 mb-4">
+        <div className='d-flex justify-content-between mb-3'>
 
           <div
-            className="d-inline-flex align-items-center gap-2 rounded-pill px-3 py-2 mb-3"
+            className="d-inline-flex align-items-center gap-2 rounded-pill px-3 py-2"
             style={{
               background: '#F5F3FF',
               color: '#7C3AED',
@@ -75,6 +74,26 @@ function Learner() {
             <i className="bi bi-stars"></i>
             LEARNING ECOSYSTEM
           </div>
+
+          <Link
+            to="/learner/profile"
+            className="btn text-decoration-none"
+            style={{
+              background: '#7C3AED',
+              color: '#F5F3FF',
+              border: '1px solid #E9D5FF',
+              borderRadius: '10px',
+              padding: '6px 14px',
+              fontWeight: '500'
+            }}
+          >
+            Edit Profile
+          </Link>
+
+        </div>
+
+        {/* ================= HEADER ================= */}
+        <div className="col-lg-8 mb-4">
 
           <h2
             className="fw-bold mb-2"
