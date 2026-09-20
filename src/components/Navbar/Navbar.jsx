@@ -197,7 +197,6 @@ function Navbar() {
 
                 </div>
 
-
                 {/* Logout */}
                 <button
                   type="button"

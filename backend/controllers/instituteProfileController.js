@@ -2,6 +2,21 @@ const InstituteProfile = require('../models/InstituteProfile')
 const cloudinary = require('../config/cloudinary')
 const streamifier = require('streamifier')
 
+const deleteCloudinaryImage = async (publicId) => {
+  if (!publicId) {
+    return
+  }
+
+  try {
+    await cloudinary.uploader.destroy(publicId)
+  } catch (error) {
+    console.error(
+      'Cloudinary image deletion error:',
+      error
+    )
+  }
+}
+
 const getInstituteProfile = async (req, res) => {
   try {
     // Only institute accounts can access this profile
@@ -203,12 +218,18 @@ const uploadInstituteProfilePhoto = async (req, res) => {
       })
     }
 
+    const oldPublicId = profile.profilePhoto?.publicId
+
     const result = await uploadToCloudinary()
 
     profile.profilePhoto.url = result.secure_url
     profile.profilePhoto.publicId = result.public_id
 
     await profile.save()
+
+    if (oldPublicId) {
+      await deleteCloudinaryImage(oldPublicId)
+    }
 
     res.status(200).json({
       success: true,
@@ -277,12 +298,18 @@ const uploadInstituteCoverPhoto = async (req, res) => {
       })
     }
 
+    const oldPublicId = profile.coverPhoto?.publicId
+
     const result = await uploadToCloudinary()
 
     profile.coverPhoto.url = result.secure_url
     profile.coverPhoto.publicId = result.public_id
 
     await profile.save()
+
+    if (oldPublicId) {
+      await deleteCloudinaryImage(oldPublicId)
+    }
 
     res.status(200).json({
       success: true,

@@ -1,8 +1,11 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import ScrollToTop from '../components/ScrollToTop/ScrollToTop'
+
 import Navbar from '../components/Navbar/Navbar'
 import Home from '../pages/Home/Home'
-import Register from '../pages/Register/Register'
-import Login from '../pages/Login/Login'
+import Register from '../pages/Auth/Register'
+import Login from '../pages/Auth/Login'
+import ForgotPassword from '../pages/Auth/ForgotPassword'
 import InstitutePublicProfile from '../pages/InstitutePublic/InstitutePublicProfile'
 
 import Profile from '../pages/Profile/Profile'
@@ -25,6 +28,7 @@ import PublicOnlyRoute from './PublicOnlyRoute'
 function AppRoutes() {
   return (
     <BrowserRouter>
+      <ScrollToTop />
 
       <Navbar />
 
@@ -37,6 +41,15 @@ function AppRoutes() {
           element={
             <PublicOnlyRoute>
               <Login />
+            </PublicOnlyRoute>
+          }
+        />
+
+        <Route
+          path="/forgot-password"
+          element={
+            <PublicOnlyRoute>
+              <ForgotPassword />
             </PublicOnlyRoute>
           }
         />

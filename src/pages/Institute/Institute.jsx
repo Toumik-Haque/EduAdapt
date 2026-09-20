@@ -60,7 +60,7 @@ function Institute() {
           )
         }
 
-        setBatchOverview(batchData.batches)
+        setBatchOverview(batchData.batches || [])
 
       } catch (error) {
         console.error(
@@ -79,400 +79,787 @@ function Institute() {
     }
   }, [token])
 
+  const instituteName =
+    user?.profile?.instituteName || 'Your Institute'
+
   return (
     <div
-      className="container py-4 py-md-5"
       style={{
-        minHeight: 'calc(100vh - 70px)'
+        minHeight: 'calc(100vh - 70px)',
+        background: '#FAF9FC'
       }}
     >
+      <div className="container py-4 py-md-5">
 
-      {/* Header */}
-      <div className="mb-4">
+        {/* =====================================================
+            HEADER
+        ===================================================== */}
+        <div className="mb-4">
 
-        <div className="d-flex justify-content-between align-items-start gap-3 flex-wrap">
+          <div className="d-flex justify-content-between align-items-center gap-3 flex-wrap">
 
-          <div>
-            <h1
-              className="fw-bold mb-2"
+            <div className="d-flex align-items-center gap-3">
+
+              <div
+                className="d-flex align-items-center justify-content-center flex-shrink-0"
+                style={{
+                  width: '48px',
+                  height: '48px',
+                  borderRadius: '14px',
+                  background: '#F5F3FF',
+                  border: '1px solid #E9D5FF',
+                  color: '#7C3AED'
+                }}
+              >
+                <i
+                  className="bi bi-building"
+                  style={{
+                    fontSize: '22px'
+                  }}
+                />
+              </div>
+
+              <div>
+                <div
+                  className="small mb-1"
+                  style={{
+                    color: '#8B5CF6',
+                    fontWeight: '600'
+                  }}
+                >
+                  INSTITUTE WORKSPACE
+                </div>
+
+                <h1
+                  className="fw-bold mb-1"
+                  style={{
+                    color: '#18181B',
+                    fontSize: 'clamp(24px, 3vw, 32px)',
+                    letterSpacing: '-0.5px'
+                  }}
+                >
+                  {instituteName}
+                </h1>
+
+                <p
+                  className="mb-0"
+                  style={{
+                    color: '#71717A',
+                    fontSize: '14px'
+                  }}
+                >
+                  Manage your learning ecosystem from one place.
+                </p>
+              </div>
+
+            </div>
+
+            <Link
+              to={`/institutions/${user?._id}`}
+              className="btn text-decoration-none d-flex align-items-center gap-2 flex-shrink-0"
               style={{
-                color: '#18181B'
+                background: '#7C3AED',
+                color: '#FFFFFF',
+                border: '1px solid #7C3AED',
+                borderRadius: '10px',
+                padding: '9px 15px',
+                fontWeight: '500',
+                fontSize: '14px'
               }}
             >
-              Hi, {user?.profile?.instituteName}
-            </h1>
+              <i className="bi bi-eye" />
+              View Public Profile
+            </Link>
 
-            <p
-              className="mb-0"
-              style={{
-                color: '#71717A'
-              }}
-            >
-              Manage your institution's learning ecosystem.
-            </p>
           </div>
-
-          <Link
-            to={`/institutions/${user._id}`}
-            className="btn text-decoration-none flex-shrink-0"
-            style={{
-              background: '#F5F3FF',
-              color: '#7C3AED',
-              border: '1px solid #E9D5FF',
-              borderRadius: '10px',
-              padding: '8px 14px',
-              fontWeight: '500'
-            }}
-          >
-            View Public Profile
-          </Link>
 
         </div>
 
-      </div>
-
-      {/* Overview */}
-      <div className="mb-4">
-
-        <h5
-          className="fw-bold mb-3"
-          style={{
-            color: '#18181B'
-          }}
-        >
-          Institute Overview
-        </h5>
-
-        {loading && (
-          <div className="text-secondary">
-            Loading overview...
-          </div>
-        )}
-
+        {/* =====================================================
+            ERROR
+        ===================================================== */}
         {error && (
           <div
-            className="px-3 py-2"
+            className="d-flex align-items-start gap-2 mb-4 px-3 py-3"
             style={{
               background: '#FEF2F2',
+              border: '1px solid #FECACA',
               color: '#B91C1C',
-              borderRadius: '10px'
+              borderRadius: '12px',
+              fontSize: '14px'
             }}
           >
-            {error}
+            <i className="bi bi-exclamation-circle mt-1" />
+
+            <div>
+              <div className="fw-semibold mb-1">
+                Unable to load institute data
+              </div>
+
+              <div>
+                {error}
+              </div>
+            </div>
           </div>
         )}
 
-        {!loading && !error && overview && (
-          <div className="row g-3">
+        {/* =====================================================
+            OVERVIEW
+        ===================================================== */}
+        <section className="mb-5">
 
-            {/* Batches */}
-            <div className="col-12 col-sm-6 col-lg-3">
-              <div
-                className="card border-0 shadow-sm h-100"
-                style={{
-                  borderRadius: '16px'
-                }}
-              >
-                <div className="card-body p-4">
-                  <div
-                    className="small mb-2"
-                    style={{
-                      color: '#71717A'
-                    }}
-                  >
-                    Batches
-                  </div>
+          <div className="d-flex justify-content-between align-items-end mb-3">
 
-                  <div
-                    className="fw-bold"
-                    style={{
-                      fontSize: '28px',
-                      color: '#18181B'
-                    }}
-                  >
-                    {overview.batches}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Teachers */}
-            <div className="col-12 col-sm-6 col-lg-3">
-              <div
-                className="card border-0 shadow-sm h-100"
-                style={{
-                  borderRadius: '16px'
-                }}
-              >
-                <div className="card-body p-4">
-                  <div
-                    className="small mb-2"
-                    style={{
-                      color: '#71717A'
-                    }}
-                  >
-                    Teachers
-                  </div>
-
-                  <div
-                    className="fw-bold"
-                    style={{
-                      fontSize: '28px',
-                      color: '#18181B'
-                    }}
-                  >
-                    {overview.teachers}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Learners */}
-            <div className="col-12 col-sm-6 col-lg-3">
-              <div
-                className="card border-0 shadow-sm h-100"
-                style={{
-                  borderRadius: '16px'
-                }}
-              >
-                <div className="card-body p-4">
-                  <div
-                    className="small mb-2"
-                    style={{
-                      color: '#71717A'
-                    }}
-                  >
-                    Learners
-                  </div>
-
-                  <div
-                    className="fw-bold"
-                    style={{
-                      fontSize: '28px',
-                      color: '#18181B'
-                    }}
-                  >
-                    {overview.learners}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Pending Requests */}
-            <div className="col-12 col-sm-6 col-lg-3">
-              <div
-                className="card border-0 shadow-sm h-100"
-                style={{
-                  borderRadius: '16px'
-                }}
-              >
-                <div className="card-body p-4">
-                  <div
-                    className="small mb-2"
-                    style={{
-                      color: '#71717A'
-                    }}
-                  >
-                    Pending Teacher Requests
-                  </div>
-
-                  <div
-                    className="fw-bold"
-                    style={{
-                      fontSize: '28px',
-                      color: '#18181B'
-                    }}
-                  >
-                    {overview.pendingTeacherRequests}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-          </div>
-        )}
-
-      </div>
-
-      {/* Batch Overview */}
-      <div className="mb-4">
-
-        <div className="d-flex justify-content-between align-items-center mb-3">
-          <h5
-            className="fw-bold mb-0"
-            style={{
-              color: '#18181B'
-            }}
-          >
-            Batch Overview
-          </h5>
-
-          <Link
-            to="/institute/batches"
-            className="small text-decoration-none"
-            style={{
-              color: '#7C3AED',
-              fontWeight: '500'
-            }}
-          >
-            Manage Batches
-          </Link>
-        </div>
-
-        {batchOverview.length === 0 ? (
-          <div
-            className="card border-0 shadow-sm"
-            style={{
-              borderRadius: '16px'
-            }}
-          >
-            <div className="card-body p-4 text-center">
-
-              <div
-                className="fw-semibold mb-1"
+            <div>
+              <h5
+                className="fw-bold mb-1"
                 style={{
                   color: '#18181B'
                 }}
               >
-                No batches yet
-              </div>
+                Overview
+              </h5>
 
-              <div
-                className="small"
+              <p
+                className="mb-0"
                 style={{
-                  color: '#71717A'
+                  color: '#71717A',
+                  fontSize: '13px'
                 }}
               >
-                Create a batch to start organizing teachers
-                and learners.
+                A quick look at your institution.
+              </p>
+            </div>
+
+          </div>
+
+          {loading ? (
+            <div className="row g-3">
+
+              {[1, 2, 3, 4].map(item => (
+                <div
+                  className="col-12 col-sm-6 col-lg-3"
+                  key={item}
+                >
+                  <div
+                    className="card border-0 h-100"
+                    style={{
+                      borderRadius: '14px',
+                      border: '1px solid #E4E4E7',
+                      boxShadow: 'none'
+                    }}
+                  >
+                    <div className="card-body p-3">
+                      <div
+                        style={{
+                          width: '36px',
+                          height: '36px',
+                          borderRadius: '10px',
+                          background: '#F4F4F5',
+                          marginBottom: '14px'
+                        }}
+                      />
+
+                      <div
+                        style={{
+                          width: '80px',
+                          height: '10px',
+                          borderRadius: '5px',
+                          background: '#F4F4F5',
+                          marginBottom: '10px'
+                        }}
+                      />
+
+                      <div
+                        style={{
+                          width: '50px',
+                          height: '24px',
+                          borderRadius: '5px',
+                          background: '#F4F4F5'
+                        }}
+                      />
+                    </div>
+                  </div>
+                </div>
+              ))}
+
+            </div>
+          ) : overview ? (
+
+            <div className="row g-3">
+
+              {/* Batches */}
+              <div className="col-12 col-sm-6 col-lg-3">
+                <div
+                  className="card border-0 h-100"
+                  style={{
+                    borderRadius: '14px',
+                    border: '1px solid #E4E4E7',
+                    boxShadow: '0 2px 8px rgba(24, 24, 27, 0.04)'
+                  }}
+                >
+                  <div className="card-body p-3">
+
+                    <div
+                      className="d-flex align-items-center justify-content-center mb-3"
+                      style={{
+                        width: '38px',
+                        height: '38px',
+                        borderRadius: '10px',
+                        background: '#F5F3FF',
+                        color: '#7C3AED'
+                      }}
+                    >
+                      <i className="bi bi-collection" />
+                    </div>
+
+                    <div
+                      className="small mb-1"
+                      style={{
+                        color: '#71717A'
+                      }}
+                    >
+                      Batches
+                    </div>
+
+                    <div
+                      className="fw-bold"
+                      style={{
+                        fontSize: '26px',
+                        lineHeight: '1.2',
+                        color: '#18181B'
+                      }}
+                    >
+                      {overview.batches}
+                    </div>
+
+                  </div>
+                </div>
+              </div>
+
+              {/* Teachers */}
+              <div className="col-12 col-sm-6 col-lg-3">
+                <div
+                  className="card border-0 h-100"
+                  style={{
+                    borderRadius: '14px',
+                    border: '1px solid #E4E4E7',
+                    boxShadow: '0 2px 8px rgba(24, 24, 27, 0.04)'
+                  }}
+                >
+                  <div className="card-body p-3">
+
+                    <div
+                      className="d-flex align-items-center justify-content-center mb-3"
+                      style={{
+                        width: '38px',
+                        height: '38px',
+                        borderRadius: '10px',
+                        background: '#F5F3FF',
+                        color: '#7C3AED'
+                      }}
+                    >
+                      <i className="bi bi-person-video3" />
+                    </div>
+
+                    <div
+                      className="small mb-1"
+                      style={{
+                        color: '#71717A'
+                      }}
+                    >
+                      Teachers
+                    </div>
+
+                    <div
+                      className="fw-bold"
+                      style={{
+                        fontSize: '26px',
+                        lineHeight: '1.2',
+                        color: '#18181B'
+                      }}
+                    >
+                      {overview.teachers}
+                    </div>
+
+                  </div>
+                </div>
+              </div>
+
+              {/* Learners */}
+              <div className="col-12 col-sm-6 col-lg-3">
+                <div
+                  className="card border-0 h-100"
+                  style={{
+                    borderRadius: '14px',
+                    border: '1px solid #E4E4E7',
+                    boxShadow: '0 2px 8px rgba(24, 24, 27, 0.04)'
+                  }}
+                >
+                  <div className="card-body p-3">
+
+                    <div
+                      className="d-flex align-items-center justify-content-center mb-3"
+                      style={{
+                        width: '38px',
+                        height: '38px',
+                        borderRadius: '10px',
+                        background: '#F5F3FF',
+                        color: '#7C3AED'
+                      }}
+                    >
+                      <i className="bi bi-people" />
+                    </div>
+
+                    <div
+                      className="small mb-1"
+                      style={{
+                        color: '#71717A'
+                      }}
+                    >
+                      Learners
+                    </div>
+
+                    <div
+                      className="fw-bold"
+                      style={{
+                        fontSize: '26px',
+                        lineHeight: '1.2',
+                        color: '#18181B'
+                      }}
+                    >
+                      {overview.learners}
+                    </div>
+
+                  </div>
+                </div>
+              </div>
+
+              {/* Requests */}
+              <div className="col-12 col-sm-6 col-lg-3">
+                <div
+                  className="card border-0 h-100"
+                  style={{
+                    borderRadius: '14px',
+                    border: '1px solid #E4E4E7',
+                    boxShadow: '0 2px 8px rgba(24, 24, 27, 0.04)'
+                  }}
+                >
+                  <div className="card-body p-3">
+
+                    <div
+                      className="d-flex align-items-center justify-content-center mb-3"
+                      style={{
+                        width: '38px',
+                        height: '38px',
+                        borderRadius: '10px',
+                        background: '#FFF7ED',
+                        color: '#EA580C'
+                      }}
+                    >
+                      <i className="bi bi-person-plus" />
+                    </div>
+
+                    <div
+                      className="small mb-1"
+                      style={{
+                        color: '#71717A'
+                      }}
+                    >
+                      Pending Requests
+                    </div>
+
+                    <div
+                      className="fw-bold"
+                      style={{
+                        fontSize: '26px',
+                        lineHeight: '1.2',
+                        color: '#18181B'
+                      }}
+                    >
+                      {overview.pendingTeacherRequests}
+                    </div>
+
+                  </div>
+                </div>
               </div>
 
             </div>
-          </div>
-        ) : (
-          <div className="row g-3">
 
-            {batchOverview.map(batch => (
-              <div
-                className="col-12 col-md-6"
-                key={batch.batchId}
+          ) : null}
+
+        </section>
+
+        {/* =====================================================
+            BATCH OVERVIEW
+        ===================================================== */}
+        <section className="mb-5">
+
+          <div className="d-flex justify-content-between align-items-end mb-3">
+
+            <div>
+              <h5
+                className="fw-bold mb-1"
+                style={{
+                  color: '#18181B'
+                }}
               >
+                Learning Spaces
+              </h5>
+
+              <p
+                className="mb-0"
+                style={{
+                  color: '#71717A',
+                  fontSize: '13px'
+                }}
+              >
+                Monitor teachers and learners across your batches.
+              </p>
+            </div>
+
+            <Link
+              to="/institute/batches"
+              className="text-decoration-none d-flex align-items-center gap-1"
+              style={{
+                color: '#7C3AED',
+                fontSize: '13px',
+                fontWeight: '600'
+              }}
+            >
+              Manage Batches
+              <i className="bi bi-arrow-right" />
+            </Link>
+
+          </div>
+
+          {loading ? (
+            <div
+              className="card border-0"
+              style={{
+                borderRadius: '14px',
+                border: '1px solid #E4E4E7'
+              }}
+            >
+              <div className="card-body p-4 text-center">
                 <div
-                  className="card border-0 shadow-sm h-100"
+                  className="spinner-border spinner-border-sm"
                   style={{
-                    borderRadius: '16px'
+                    color: '#7C3AED'
+                  }}
+                  role="status"
+                />
+
+                <div
+                  className="small mt-2"
+                  style={{
+                    color: '#71717A'
                   }}
                 >
+                  Loading batches...
+                </div>
+              </div>
+            </div>
+          ) : batchOverview.length === 0 ? (
 
-                  <div className="card-body p-4">
+            <div
+              className="card border-0"
+              style={{
+                borderRadius: '14px',
+                border: '1px solid #E4E4E7',
+                boxShadow: '0 2px 8px rgba(24, 24, 27, 0.03)'
+              }}
+            >
+              <div className="card-body p-4 text-center">
 
-                    <div className="mb-3">
+                <div
+                  className="d-flex align-items-center justify-content-center mx-auto mb-3"
+                  style={{
+                    width: '46px',
+                    height: '46px',
+                    borderRadius: '12px',
+                    background: '#F5F3FF',
+                    color: '#7C3AED'
+                  }}
+                >
+                  <i
+                    className="bi bi-collection"
+                    style={{
+                      fontSize: '20px'
+                    }}
+                  />
+                </div>
 
-                      <h6
-                        className="fw-bold mb-1"
-                        style={{
-                          color: '#18181B'
-                        }}
-                      >
-                        {batch.name}
-                      </h6>
+                <div
+                  className="fw-semibold mb-1"
+                  style={{
+                    color: '#18181B'
+                  }}
+                >
+                  No learning spaces yet
+                </div>
 
-                      {(batch.department ||
-                        batch.academicYear) && (
-                          <div
-                            className="small"
-                            style={{
-                              color: '#71717A'
-                            }}
-                          >
-                            {batch.department}
-                            {batch.department &&
-                              batch.academicYear &&
-                              ' • '}
-                            {batch.academicYear}
-                          </div>
-                        )}
+                <div
+                  className="small mb-3"
+                  style={{
+                    color: '#71717A'
+                  }}
+                >
+                  Create a batch to organize teachers and learners.
+                </div>
 
-                    </div>
+                <Link
+                  to="/institute/batches"
+                  className="btn text-decoration-none"
+                  style={{
+                    background: '#7C3AED',
+                    color: '#FFFFFF',
+                    borderRadius: '9px',
+                    padding: '8px 14px',
+                    fontSize: '13px',
+                    fontWeight: '500'
+                  }}
+                >
+                  <i className="bi bi-plus-lg me-1" />
+                  Create Batch
+                </Link>
 
-                    <div className="row g-2">
+              </div>
+            </div>
 
-                      <div className="col-6">
+          ) : (
+
+            <div className="row g-3">
+
+              {batchOverview.map(batch => (
+                <div
+                  className="col-12 col-md-6 col-xl-4"
+                  key={batch.batchId}
+                >
+                  <div
+                    className="card border-0 h-100"
+                    style={{
+                      borderRadius: '14px',
+                      border: '1px solid #E4E4E7',
+                      boxShadow: '0 2px 8px rgba(24, 24, 27, 0.04)'
+                    }}
+                  >
+
+                    <div className="card-body p-3">
+
+                      {/* Batch Header */}
+                      <div className="d-flex align-items-start gap-3 mb-4">
+
                         <div
-                          className="p-3"
+                          className="d-flex align-items-center justify-content-center flex-shrink-0"
                           style={{
+                            width: '40px',
+                            height: '40px',
+                            borderRadius: '10px',
                             background: '#F5F3FF',
-                            borderRadius: '12px'
+                            color: '#7C3AED'
                           }}
                         >
-                          <div
-                            className="small"
-                            style={{
-                              color: '#71717A'
-                            }}
-                          >
-                            Teachers
-                          </div>
-
-                          <div
-                            className="fw-bold"
-                            style={{
-                              color: '#18181B',
-                              fontSize: '22px'
-                            }}
-                          >
-                            {batch.teachers}
-                          </div>
+                          <i className="bi bi-mortarboard" />
                         </div>
+
+                        <div
+                          className="min-w-0"
+                          style={{
+                            minWidth: 0
+                          }}
+                        >
+                          <h6
+                            className="fw-bold mb-1 text-truncate"
+                            style={{
+                              color: '#18181B'
+                            }}
+                          >
+                            {batch.name}
+                          </h6>
+
+                          {(batch.department ||
+                            batch.academicYear) && (
+                            <div
+                              className="small text-truncate"
+                              style={{
+                                color: '#71717A'
+                              }}
+                            >
+                              {batch.department}
+
+                              {batch.department &&
+                                batch.academicYear &&
+                                ' • '}
+
+                              {batch.academicYear}
+                            </div>
+                          )}
+
+                        </div>
+
                       </div>
 
-                      <div className="col-6">
-                        <div
-                          className="p-3"
-                          style={{
-                            background: '#F5F3FF',
-                            borderRadius: '12px'
-                          }}
-                        >
-                          <div
-                            className="small"
-                            style={{
-                              color: '#71717A'
-                            }}
-                          >
-                            Learners
-                          </div>
+                      {/* Batch Stats */}
+                      <div className="row g-2">
 
+                        <div className="col-6">
                           <div
-                            className="fw-bold"
+                            className="d-flex align-items-center gap-2 p-2"
                             style={{
-                              color: '#18181B',
-                              fontSize: '22px'
+                              background: '#FAFAFA',
+                              border: '1px solid #F0F0F2',
+                              borderRadius: '10px'
                             }}
                           >
-                            {batch.learners}
+
+                            <div
+                              className="d-flex align-items-center justify-content-center flex-shrink-0"
+                              style={{
+                                width: '30px',
+                                height: '30px',
+                                borderRadius: '8px',
+                                background: '#F5F3FF',
+                                color: '#7C3AED'
+                              }}
+                            >
+                              <i
+                                className="bi bi-person-video3"
+                                style={{
+                                  fontSize: '13px'
+                                }}
+                              />
+                            </div>
+
+                            <div>
+                              <div
+                                style={{
+                                  fontSize: '18px',
+                                  lineHeight: '1',
+                                  fontWeight: '700',
+                                  color: '#18181B'
+                                }}
+                              >
+                                {batch.teachers}
+                              </div>
+
+                              <div
+                                style={{
+                                  fontSize: '11px',
+                                  color: '#71717A',
+                                  marginTop: '4px'
+                                }}
+                              >
+                                Teachers
+                              </div>
+                            </div>
+
                           </div>
                         </div>
+
+                        <div className="col-6">
+                          <div
+                            className="d-flex align-items-center gap-2 p-2"
+                            style={{
+                              background: '#FAFAFA',
+                              border: '1px solid #F0F0F2',
+                              borderRadius: '10px'
+                            }}
+                          >
+
+                            <div
+                              className="d-flex align-items-center justify-content-center flex-shrink-0"
+                              style={{
+                                width: '30px',
+                                height: '30px',
+                                borderRadius: '8px',
+                                background: '#F5F3FF',
+                                color: '#7C3AED'
+                              }}
+                            >
+                              <i
+                                className="bi bi-people"
+                                style={{
+                                  fontSize: '13px'
+                                }}
+                              />
+                            </div>
+
+                            <div>
+                              <div
+                                style={{
+                                  fontSize: '18px',
+                                  lineHeight: '1',
+                                  fontWeight: '700',
+                                  color: '#18181B'
+                                }}
+                              >
+                                {batch.learners}
+                              </div>
+
+                              <div
+                                style={{
+                                  fontSize: '11px',
+                                  color: '#71717A',
+                                  marginTop: '4px'
+                                }}
+                              >
+                                Learners
+                              </div>
+                            </div>
+
+                          </div>
+                        </div>
+
                       </div>
 
                     </div>
 
                   </div>
-
                 </div>
-              </div>
-            ))}
+              ))}
 
+            </div>
+
+          )}
+
+        </section>
+
+        {/* =====================================================
+            MANAGEMENT
+        ===================================================== */}
+        <section className="mb-4">
+
+          <div className="mb-4">
+            <h5
+              className="fw-bold mb-1"
+              style={{
+                color: '#18181B'
+              }}
+            >
+              Institute Management
+            </h5>
+
+            <p
+              className="mb-0"
+              style={{
+                color: '#71717A',
+                fontSize: '13px'
+              }}
+            >
+              Manage your institution's teachers, requests and batches.
+            </p>
           </div>
-        )}
+
+          <TeacherRequests />
+
+          <div className="mt-4">
+            <BatchManagement />
+          </div>
+
+        </section>
 
       </div>
-
-      {/* Existing Management */}
-      <TeacherRequests />
-
-      <BatchManagement />
-
     </div>
   )
 }

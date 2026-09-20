@@ -20,7 +20,6 @@ const membershipRoutes = require('./routes/membershipRoutes')
 const batchRoutes = require('./routes/batchRoutes')
 const subjectRoutes = require('./routes/subjectRoutes')
 
-
 // Middleware
 app.use(cors())
 app.use(express.json())

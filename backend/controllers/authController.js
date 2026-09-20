@@ -5,6 +5,331 @@ const User = require('../models/User')
 const InstituteProfile = require('../models/InstituteProfile')
 const TeacherProfile = require('../models/TeacherProfile')
 const LearnerProfile = require('../models/LearnerProfile')
+const EmailOTP = require('../models/EmailOTP')
+
+const { createOTP, verifyOTP } = require('../services/otpService')
+const { sendEmail } = require('../services/emailService')
+
+const sendRegistrationOTP = async (req, res) => {
+  try {
+    const { email } = req.body
+
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        message: 'Email is required'
+      })
+    }
+
+    const normalizedEmail = email
+      .trim()
+      .toLowerCase()
+
+    // Check whether email is already registered
+    const existingUser = await User.findOne({
+      email: normalizedEmail
+    })
+
+    if (existingUser) {
+      return res.status(409).json({
+        success: false,
+        message: 'User with this email already exists'
+      })
+    }
+
+    // Create OTP
+    const otp = await createOTP({
+      email: normalizedEmail,
+      purpose: 'registration'
+    })
+
+    // Send OTP through Brevo
+    try {
+      await sendEmail({
+        to: normalizedEmail,
+        subject: 'EduAdapt Registration OTP',
+        htmlContent: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto;">
+          <h2 style="color: #6D28D9;">
+            Verify your EduAdapt email
+          </h2>
+
+          <p>
+            Use the following OTP to continue creating your EduAdapt account:
+          </p>
+
+          <div style="
+            font-size: 32px;
+            font-weight: 700;
+            letter-spacing: 8px;
+            color: #6D28D9;
+            margin: 24px 0;
+          ">
+            ${otp}
+          </div>
+
+          <p>
+            This OTP is valid for <strong>10 minutes</strong>.
+          </p>
+
+          <p>
+            If you did not request this code, you can safely ignore this email.
+          </p>
+
+          <hr style="border: none; border-top: 1px solid #eee; margin: 24px 0;">
+
+          <p style="color: #777; font-size: 13px;">
+            EduAdapt — Adaptive Education Ecosystem
+          </p>
+        </div>
+      `
+      })
+    } catch (emailError) {
+      await EmailOTP.deleteMany({
+        email: normalizedEmail,
+        purpose: 'registration'
+      })
+
+      throw emailError
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'OTP sent successfully'
+    })
+  } catch (error) {
+    console.error(
+      'Send registration OTP error:',
+      error
+    )
+
+    if (
+      error.message &&
+      error.message.startsWith('Please wait')
+    ) {
+      return res.status(429).json({
+        success: false,
+        message: error.message
+      })
+    }
+
+    res.status(500).json({
+      success: false,
+      message: 'Unable to send OTP'
+    })
+  }
+}
+
+const sendPasswordResetOTP = async (req, res) => {
+  try {
+    const { email } = req.body
+
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        message: 'Email is required'
+      })
+    }
+
+    const normalizedEmail = email
+      .trim()
+      .toLowerCase()
+
+    // Check whether the account exists
+    const user = await User.findOne({
+      email: normalizedEmail
+    })
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'No account found with this email'
+      })
+    }
+
+    // Create password reset OTP
+    const otp = await createOTP({
+      email: normalizedEmail,
+      purpose: 'password_reset',
+      userId: user._id
+    })
+
+    // Send OTP through Brevo
+    try {
+      await sendEmail({
+        to: normalizedEmail,
+        subject: 'EduAdapt Password Reset OTP',
+        htmlContent: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto;">
+          <h2 style="color: #6D28D9;">
+            Reset your EduAdapt password
+          </h2>
+
+          <p>
+            We received a request to reset your EduAdapt account password.
+          </p>
+
+          <p>
+            Use the following OTP to continue:
+          </p>
+
+          <div style="
+            font-size: 32px;
+            font-weight: 700;
+            letter-spacing: 8px;
+            color: #6D28D9;
+            margin: 24px 0;
+          ">
+            ${otp}
+          </div>
+
+          <p>
+            This OTP is valid for <strong>10 minutes</strong>.
+          </p>
+
+          <p>
+            If you did not request a password reset, you can safely ignore this email.
+          </p>
+
+          <hr style="border: none; border-top: 1px solid #eee; margin: 24px 0;">
+
+          <p style="color: #777; font-size: 13px;">
+            EduAdapt — Adaptive Education Ecosystem
+          </p>
+        </div>
+      `
+      })
+    } catch (emailError) {
+      await EmailOTP.deleteMany({
+        email: normalizedEmail,
+        purpose: 'password_reset'
+      })
+
+      throw emailError
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Password reset OTP sent successfully'
+    })
+  } catch (error) {
+    console.error(
+      'Send password reset OTP error:',
+      error
+    )
+
+    if (
+      error.message &&
+      error.message.startsWith('Please wait')
+    ) {
+      return res.status(429).json({
+        success: false,
+        message: error.message
+      })
+    }
+
+    res.status(500).json({
+      success: false,
+      message: 'Unable to send password reset OTP'
+    })
+  }
+}
+
+const resetPassword = async (req, res) => {
+  try {
+    const {
+      email,
+      otp,
+      newPassword,
+      confirmNewPassword
+    } = req.body
+
+    // Validate required fields
+    if (
+      !email ||
+      !otp ||
+      !newPassword ||
+      !confirmNewPassword
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: 'All fields are required'
+      })
+    }
+
+    // Check password length
+    if (newPassword.length < 6) {
+      return res.status(400).json({
+        success: false,
+        message: 'Password must be at least 6 characters'
+      })
+    }
+
+    // Check password confirmation
+    if (newPassword !== confirmNewPassword) {
+      return res.status(400).json({
+        success: false,
+        message: 'Passwords do not match'
+      })
+    }
+
+    const normalizedEmail = email
+      .trim()
+      .toLowerCase()
+
+    // Make sure the account still exists
+    const user = await User.findOne({
+      email: normalizedEmail
+    })
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      })
+    }
+
+    // Verify password reset OTP
+    const otpResult = await verifyOTP({
+      email: normalizedEmail,
+      otp,
+      purpose: 'password_reset'
+    })
+
+    if (!otpResult.success) {
+      return res.status(400).json({
+        success: false,
+        message: otpResult.message
+      })
+    }
+
+    // Hash the new password
+    const hashedPassword = await bcrypt.hash(
+      newPassword,
+      10
+    )
+
+    // Update password
+    user.password = hashedPassword
+
+    await user.save()
+
+    res.status(200).json({
+      success: true,
+      message: 'Password reset successfully'
+    })
+  } catch (error) {
+    console.error(
+      'Reset password error:',
+      error
+    )
+
+    res.status(500).json({
+      success: false,
+      message: 'Server error while resetting password'
+    })
+  }
+}
 
 const registerUser = async (req, res) => {
   try {
@@ -13,11 +338,12 @@ const registerUser = async (req, res) => {
       email,
       password,
       accountType,
-      instituteType
+      instituteType,
+      otp
     } = req.body
 
     // Validate common required fields
-    if (!name || !email || !password || !accountType) {
+    if (!name || !email || !password || !accountType || !otp) {
       return res.status(400).json({
         success: false,
         message: 'Required registration fields are missing'
@@ -56,6 +382,20 @@ const registerUser = async (req, res) => {
 
     // Normalize email
     const normalizedEmail = email.trim().toLowerCase()
+
+    // Verify registration OTP before creating the account
+    const otpResult = await verifyOTP({
+      email: normalizedEmail,
+      otp,
+      purpose: 'registration'
+    })
+
+    if (!otpResult.success) {
+      return res.status(400).json({
+        success: false,
+        message: otpResult.message
+      })
+    }
 
     // Check existing email
     const existingUser = await User.findOne({
@@ -430,6 +770,9 @@ const updateMyProfile = async (req, res) => {
 
 module.exports = {
   registerUser,
+  sendRegistrationOTP,
+  sendPasswordResetOTP,
+  resetPassword,
   loginUser,
   getCurrentUser,
   getMyProfile,

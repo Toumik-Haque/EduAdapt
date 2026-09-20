@@ -126,128 +126,424 @@ function TeacherRequests() {
   }
 
   return (
-    <div className="mb-4">
+    <section>
 
-      <div className="mb-3">
-        <h5 className="fw-semibold mb-1">
-          Teacher Requests
-        </h5>
+      {/* =====================================================
+          SECTION HEADER
+      ===================================================== */}
+      <div className="d-flex justify-content-between align-items-end mb-3">
 
-        <p className="text-muted small mb-0">
-          Review teachers requesting access to your batches.
-        </p>
+        <div className="d-flex align-items-start gap-3">
+
+          <div
+            className="d-flex align-items-center justify-content-center flex-shrink-0"
+            style={{
+              width: '40px',
+              height: '40px',
+              borderRadius: '11px',
+              background: '#F5F3FF',
+              color: '#7C3AED'
+            }}
+          >
+            <i
+              className="bi bi-person-plus"
+              style={{
+                fontSize: '17px'
+              }}
+            />
+          </div>
+
+          <div>
+            <h5
+              className="fw-bold mb-1"
+              style={{
+                color: '#18181B'
+              }}
+            >
+              Teacher Requests
+            </h5>
+
+            <p
+              className="mb-0"
+              style={{
+                color: '#71717A',
+                fontSize: '13px'
+              }}
+            >
+              Review teachers requesting access to your batches.
+            </p>
+          </div>
+
+        </div>
+
+        {/* Request count */}
+        {!loading && requests.length > 0 && (
+          <div
+            className="d-flex align-items-center gap-1 px-2 py-1"
+            style={{
+              background: '#FFF7ED',
+              color: '#C2410C',
+              borderRadius: '8px',
+              fontSize: '12px',
+              fontWeight: '600'
+            }}
+          >
+            <i className="bi bi-clock" />
+            {requests.length} Pending
+          </div>
+        )}
+
       </div>
 
+      {/* =====================================================
+          ALERTS
+      ===================================================== */}
       {error && (
-        <div className="alert alert-danger">
-          {error}
+        <div
+          className="d-flex align-items-start gap-2 mb-3 px-3 py-2"
+          style={{
+            background: '#FEF2F2',
+            border: '1px solid #FECACA',
+            color: '#B91C1C',
+            borderRadius: '10px',
+            fontSize: '13px'
+          }}
+        >
+          <i className="bi bi-exclamation-circle mt-1" />
+
+          <span>{error}</span>
         </div>
       )}
 
       {success && (
-        <div className="alert alert-success">
-          {success}
+        <div
+          className="d-flex align-items-center gap-2 mb-3 px-3 py-2"
+          style={{
+            background: '#F0FDF4',
+            border: '1px solid #BBF7D0',
+            color: '#15803D',
+            borderRadius: '10px',
+            fontSize: '13px'
+          }}
+        >
+          <i className="bi bi-check-circle" />
+
+          <span>{success}</span>
         </div>
       )}
 
+      {/* =====================================================
+          LOADING
+      ===================================================== */}
       {loading ? (
-        <div className="text-center py-4">
-          Loading teacher requests...
+
+        <div
+          className="card border-0"
+          style={{
+            borderRadius: '14px',
+            border: '1px solid #E4E4E7',
+            boxShadow: '0 2px 8px rgba(24, 24, 27, 0.03)'
+          }}
+        >
+          <div
+            className="card-body py-5 text-center"
+          >
+            <div
+              className="spinner-border spinner-border-sm mb-2"
+              style={{
+                color: '#7C3AED'
+              }}
+              role="status"
+            />
+
+            <div
+              className="small"
+              style={{
+                color: '#71717A'
+              }}
+            >
+              Loading teacher requests...
+            </div>
+          </div>
         </div>
+
       ) : requests.length === 0 ? (
-        <div className="card border-0 shadow-sm">
-          <div className="card-body text-center py-5">
 
-            <i className="bi bi-person-check fs-1 text-muted"></i>
+        /* =====================================================
+           EMPTY STATE
+        ===================================================== */
+        <div
+          className="card border-0"
+          style={{
+            borderRadius: '14px',
+            border: '1px solid #E4E4E7',
+            boxShadow: '0 2px 8px rgba(24, 24, 27, 0.03)'
+          }}
+        >
+          <div
+            className="card-body text-center py-5"
+          >
 
-            <h6 className="mt-3">
-              No pending teacher requests
+            <div
+              className="d-flex align-items-center justify-content-center mx-auto mb-3"
+              style={{
+                width: '46px',
+                height: '46px',
+                borderRadius: '12px',
+                background: '#F5F3FF',
+                color: '#7C3AED'
+              }}
+            >
+              <i
+                className="bi bi-person-check"
+                style={{
+                  fontSize: '20px'
+                }}
+              />
+            </div>
+
+            <h6
+              className="fw-semibold mb-1"
+              style={{
+                color: '#18181B'
+              }}
+            >
+              No pending requests
             </h6>
 
-            <p className="text-muted small mb-0">
+            <p
+              className="small mb-0"
+              style={{
+                color: '#71717A'
+              }}
+            >
               New teacher requests will appear here.
             </p>
 
           </div>
         </div>
+
       ) : (
+
+        /* =====================================================
+           REQUEST CARDS
+        ===================================================== */
         <div className="row g-3">
 
-          {requests.map((request) => (
-            <div
-              className="col-md-6 col-lg-4"
-              key={request.membershipId}
-            >
-              <div className="card border-0 shadow-sm h-100">
+          {requests.map((request) => {
 
-                <div className="card-body">
+            const isProcessing =
+              processingId === request.membershipId
 
-                  <h6 className="fw-semibold mb-1">
-                    {request.teacherName}
-                  </h6>
+            return (
+              <div
+                className="col-12 col-md-6 col-xl-4"
+                key={request.membershipId}
+              >
 
-                  <p className="text-muted small mb-3">
-                    {request.teacherEmail}
-                  </p>
+                <div
+                  className="card border-0 h-100"
+                  style={{
+                    borderRadius: '14px',
+                    border: '1px solid #E4E4E7',
+                    boxShadow: '0 2px 8px rgba(24, 24, 27, 0.04)'
+                  }}
+                >
 
-                  <div className="mb-3">
+                  <div className="card-body p-3">
 
-                    <div className="small fw-semibold">
-                      Requested Batch
-                    </div>
-
-                    <div className="text-muted small">
-                      {request.batchName}
-                    </div>
-
-                    <div className="text-muted small">
-                      {request.department || 'Department not specified'}
-                      {' • '}
-                      {request.academicYear || 'Academic year not specified'}
-                    </div>
-
-                  </div>
-
-                  <div className="d-flex gap-2">
-
-                    <button
-                      className="btn btn-primary btn-sm flex-grow-1"
-                      disabled={
-                        processingId === request.membershipId
-                      }
-                      onClick={() =>
-                        handleApprove(request.membershipId)
-                      }
+                    {/* =====================================
+                        TEACHER
+                    ===================================== */}
+                    <div
+                      className="d-flex align-items-center gap-3 mb-3"
                     >
-                      {processingId === request.membershipId
-                        ? 'Processing...'
-                        : 'Approve'}
-                    </button>
 
-                    <button
-                      className="btn btn-outline-danger btn-sm flex-grow-1"
-                      disabled={
-                        processingId === request.membershipId
-                      }
-                      onClick={() =>
-                        handleReject(request.membershipId)
-                      }
+                      <div
+                        className="d-flex align-items-center justify-content-center flex-shrink-0"
+                        style={{
+                          width: '42px',
+                          height: '42px',
+                          borderRadius: '11px',
+                          background: '#F5F3FF',
+                          color: '#7C3AED'
+                        }}
+                      >
+                        <i
+                          className="bi bi-person"
+                          style={{
+                            fontSize: '19px'
+                          }}
+                        />
+                      </div>
+
+                      <div
+                        style={{
+                          minWidth: 0
+                        }}
+                      >
+                        <h6
+                          className="fw-semibold mb-1 text-truncate"
+                          style={{
+                            color: '#18181B'
+                          }}
+                        >
+                          {request.teacherName}
+                        </h6>
+
+                        <div
+                          className="small text-truncate"
+                          style={{
+                            color: '#71717A'
+                          }}
+                        >
+                          {request.teacherEmail}
+                        </div>
+                      </div>
+
+                    </div>
+
+                    {/* =====================================
+                        REQUEST INFORMATION
+                    ===================================== */}
+                    <div
+                      className="p-3 mb-3"
+                      style={{
+                        background: '#FAFAFA',
+                        border: '1px solid #F0F0F2',
+                        borderRadius: '11px'
+                      }}
                     >
-                      Reject
-                    </button>
+
+                      <div
+                        className="d-flex align-items-center gap-2 mb-2"
+                      >
+                        <i
+                          className="bi bi-mortarboard"
+                          style={{
+                            color: '#7C3AED',
+                            fontSize: '13px'
+                          }}
+                        />
+
+                        <span
+                          className="small fw-semibold"
+                          style={{
+                            color: '#3F3F46'
+                          }}
+                        >
+                          Requested Batch
+                        </span>
+                      </div>
+
+                      <div
+                        className="fw-semibold mb-1"
+                        style={{
+                          color: '#18181B',
+                          fontSize: '14px'
+                        }}
+                      >
+                        {request.batchName}
+                      </div>
+
+                      <div
+                        className="small"
+                        style={{
+                          color: '#71717A'
+                        }}
+                      >
+                        {request.department ||
+                          'Department not specified'}
+
+                        {' • '}
+
+                        {request.academicYear ||
+                          'Academic year not specified'}
+                      </div>
+
+                    </div>
+
+                    {/* =====================================
+                        ACTIONS
+                    ===================================== */}
+                    <div className="d-flex gap-2">
+
+                      <button
+                        type="button"
+                        className="btn flex-grow-1 d-flex align-items-center justify-content-center gap-2"
+                        disabled={isProcessing}
+                        onClick={() =>
+                          handleApprove(request.membershipId)
+                        }
+                        style={{
+                          background: isProcessing
+                            ? '#E4E4E7'
+                            : '#7C3AED',
+                          color: isProcessing
+                            ? '#71717A'
+                            : '#FFFFFF',
+                          border: '1px solid transparent',
+                          borderRadius: '9px',
+                          padding: '8px 12px',
+                          fontSize: '13px',
+                          fontWeight: '500'
+                        }}
+                      >
+                        {isProcessing ? (
+                          <>
+                            <span
+                              className="spinner-border spinner-border-sm"
+                              style={{
+                                width: '13px',
+                                height: '13px'
+                              }}
+                            />
+
+                            Processing
+                          </>
+                        ) : (
+                          <>
+                            <i className="bi bi-check-lg" />
+                            Approve
+                          </>
+                        )}
+                      </button>
+
+                      <button
+                        type="button"
+                        className="btn flex-grow-1 d-flex align-items-center justify-content-center gap-2"
+                        disabled={isProcessing}
+                        onClick={() =>
+                          handleReject(request.membershipId)
+                        }
+                        style={{
+                          background: '#FFFFFF',
+                          color: '#DC2626',
+                          border: '1px solid #FECACA',
+                          borderRadius: '9px',
+                          padding: '8px 12px',
+                          fontSize: '13px',
+                          fontWeight: '500'
+                        }}
+                      >
+                        <i className="bi bi-x-lg" />
+                        Reject
+                      </button>
+
+                    </div>
 
                   </div>
 
                 </div>
 
               </div>
-            </div>
-          ))}
+            )
+          })}
 
         </div>
       )}
 
-    </div>
+    </section>
   )
 }
 
