@@ -2,29 +2,36 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 import { useAuth } from '../../context/AuthContext'
+import { useModal } from '../../context/ModalContext'
 
 function Profile() {
   const navigate = useNavigate()
+  const { showConfirm, showAlert } = useModal()
 
   const {
     token,
     user,
-    updateProfile
+    updateProfile,
+    updateUser,
+    logout
   } = useAuth()
 
   const isInstitute =
     user?.accountType === 'institute'
 
+  const [username, setUsername] = useState('')
   const [name, setName] = useState('')
   const [instituteType, setInstituteType] =
     useState('')
 
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
+  const [deleting, setDeleting] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
 
   useEffect(() => {
+    setUsername(user?.username || '')
     if (isInstitute) {
       setName(
         user?.profile?.instituteName || ''
@@ -81,10 +88,12 @@ function Profile() {
 
       const body = isInstitute
         ? {
+            username: username.trim(),
             name: trimmedName,
             instituteType
           }
         : {
+            username: username.trim(),
             name: trimmedName
           }
 
@@ -110,6 +119,9 @@ function Profile() {
       }
 
       updateProfile(data.profile)
+      if (data.username) {
+        updateUser({ username: data.username })
+      }
 
       setSuccess(
         'Profile updated successfully'
@@ -139,6 +151,42 @@ function Profile() {
 
     if (user?.accountType === 'institute') {
       navigate('/institute')
+    }
+  }
+
+  const handleDeleteAccount = async () => {
+    const confirmed = await showConfirm(
+      'Are you sure you want to permanently delete your EduAdapt account? All your data, enrollments, and profiles will be irreversibly erased. This cannot be undone.',
+      'Delete Account',
+      'danger',
+      'Yes, Delete My Account',
+      'Cancel'
+    )
+
+    if (!confirmed) return
+
+    try {
+      setDeleting(true)
+      const res = await fetch('http://localhost:5000/api/auth/delete-account', {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
+      const data = await res.json()
+
+      if (!res.ok) {
+        throw new Error(data.message || 'Failed to delete account')
+      }
+
+      await showAlert('Your account has been deleted permanently.', 'Account Deleted', 'success')
+      logout()
+      navigate('/login')
+    } catch (err) {
+      console.error(err)
+      showAlert(err.message || 'Error deleting account', 'Error', 'danger')
+    } finally {
+      setDeleting(false)
     }
   }
 
@@ -224,7 +272,7 @@ function Profile() {
                 >
                   {isInstitute
                     ? 'Institute Name'
-                    : 'Full Name'}
+                    : 'Full Name'} <span className="required-star">*</span>
                 </label>
 
                 <input
@@ -299,6 +347,50 @@ function Profile() {
 
                 </div>
               )}
+
+              {/* Username */}
+              <div className="mb-4">
+
+                <label className="form-label fw-semibold">
+                  Username <span className="required-star">*</span>
+                </label>
+
+                <div className="input-group">
+                  <span
+                    className="input-group-text fw-semibold"
+                    style={{
+                      borderRadius: '10px 0 0 10px',
+                      background: '#F4F4F5',
+                      border: '1px solid #E4E4E7',
+                      borderRight: 'none',
+                      color: '#71717A',
+                      padding: '11px 16px',
+                      fontSize: '14px'
+                    }}
+                  >
+                    @
+                  </span>
+                  <input
+                    type="text"
+                    className="form-control"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    disabled={saving}
+                    required
+                    style={{
+                      borderRadius: '0 10px 10px 0',
+                      border: '1px solid #E4E4E7',
+                      padding: '11px 14px',
+                      fontSize: '14px'
+                    }}
+                  />
+                </div>
+
+                <small className="text-secondary mt-1 d-block" style={{ fontSize: '12px' }}>
+                  Unique handle across the EduAdapt ecosystem.
+                </small>
+
+              </div>
 
               {/* Email */}
               <div className="mb-4">
@@ -414,6 +506,42 @@ function Profile() {
               </div>
 
             </form>
+
+            {/* Danger Zone: Delete Account */}
+            <div
+              className="mt-5 p-4"
+              style={{
+                borderRadius: '16px',
+                border: '1px solid #FCA5A5',
+                background: '#FEF2F2'
+              }}
+            >
+              <div className="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-3">
+                <div>
+                  <h6 className="fw-bold mb-1" style={{ color: '#991B1B' }}>
+                    <i className="bi bi-exclamation-triangle-fill me-2" />
+                    Danger Zone
+                  </h6>
+                  <p className="mb-0 text-secondary" style={{ fontSize: '0.875rem' }}>
+                    Permanently delete your EduAdapt account (@{user?.username || 'user'}), your profile, and all associated personal data.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleDeleteAccount}
+                  disabled={deleting}
+                  className="btn btn-danger fw-semibold px-3 py-2 text-nowrap"
+                  style={{
+                    borderRadius: '10px',
+                    background: '#DC2626',
+                    border: 'none',
+                    fontSize: '0.875rem'
+                  }}
+                >
+                  {deleting ? 'Deleting...' : 'Delete Account'}
+                </button>
+              </div>
+            </div>
 
           </div>
         </div>

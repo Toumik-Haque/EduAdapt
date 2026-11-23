@@ -137,8 +137,13 @@ const searchInstitutions = async (req, res) => {
     const institutions = await User.find({
       accountType: 'institute'
     })
-      .select('email accountType')
+      .select('email username accountType')
       .lean()
+
+    const instituteUserMap = new Map()
+    institutions.forEach((i) => {
+      instituteUserMap.set(i._id.toString(), i.username || '')
+    })
 
     const instituteUserIds = institutions.map(
       institution => institution._id
@@ -163,6 +168,7 @@ const searchInstitutions = async (req, res) => {
 
     const result = profiles.map(profile => ({
       id: profile.userId,
+      username: instituteUserMap.get(profile.userId?.toString()) || '',
       instituteName: profile.instituteName,
       instituteType: profile.instituteType
     }))
@@ -745,7 +751,7 @@ const getMyTeacherBatches = async (req, res) => {
 
 const getTeacherJoinRequests = async (req, res) => {
   try {
-    // Only institutes can view teacher requests
+    // Only institutes can view teacher requests & invitations
     if (req.user.accountType !== 'institute') {
       return res.status(403).json({
         success: false,
@@ -753,66 +759,141 @@ const getTeacherJoinRequests = async (req, res) => {
       })
     }
 
-    const memberships =
-      await InstitutionMembership.find({
-        institutionId: req.user.userId,
-        role: 'teacher',
-        status: 'pending'
+    const { status, type } = req.query // optional filters
+
+    // Query 1: INCOMING REQUESTS sent by teachers to join batches
+    // Exclude anything initiatedBy: 'institute'
+    const requestQuery = {
+      institutionId: req.user.userId,
+      role: 'teacher',
+      initiatedBy: { $ne: 'institute' }
+    }
+
+    if (status && status !== 'all') {
+      requestQuery.status = status
+    }
+
+    const memberships = await InstitutionMembership.find(requestQuery)
+      .populate({
+        path: 'userId',
+        select: 'email accountType username'
       })
-        .populate({
-          path: 'userId',
-          select: 'email accountType'
-        })
-        .populate({
-          path: 'batchId',
-          select: 'name department academicYear description'
-        })
-        .lean()
+      .populate({
+        path: 'batchId',
+        select: 'name department academicYear description'
+      })
+      .sort({ createdAt: -1 })
+      .lean()
 
-    const TeacherProfile =
-      require('../models/TeacherProfile')
+    const TeacherProfile = require('../models/TeacherProfile')
 
-    const requests = await Promise.all(
+    const incomingRequests = await Promise.all(
       memberships.map(async membership => {
-        const profile =
-          await TeacherProfile.findOne({
-            userId: membership.userId?._id
-          }).select('fullName')
+        const profile = await TeacherProfile.findOne({
+          userId: membership.userId?._id
+        }).select('fullName')
 
         return {
+          id: membership._id,
           membershipId: membership._id,
-
+          type: 'request',
           teacherId: membership.userId?._id,
-
           teacherName:
             profile?.fullName ||
+            membership.userId?.username ||
             membership.userId?.email ||
-            '',
-
-          teacherEmail:
-            membership.userId?.email || '',
-
+            'Teacher',
+          teacherEmail: membership.userId?.email || '',
+          teacherUsername: membership.userId?.username || '',
           batchId: membership.batchId?._id,
-
-          batchName:
-            membership.batchId?.name || '',
-
-          department:
-            membership.batchId?.department || '',
-
-          academicYear:
-            membership.batchId?.academicYear || '',
-
-          status: membership.status,
-
+          batchName: membership.batchId?.name || '',
+          department: membership.batchId?.department || '',
+          academicYear: membership.batchId?.academicYear || '',
+          status: membership.status, // 'pending', 'approved', 'rejected'
           createdAt: membership.createdAt
         }
       })
     )
 
+    // Query 2: OUTGOING INVITATIONS sent by campus to teachers (from Notification records)
+    const Notification = require('../models/Notification')
+    const invitationQuery = {
+      institutionId: req.user.userId,
+      type: 'batch_invitation'
+    }
+
+    if (status && status !== 'all') {
+      if (status === 'pending') {
+        invitationQuery.status = { $in: ['unread', 'read'] }
+      } else if (status === 'approved') {
+        invitationQuery.status = 'accepted'
+      } else if (status === 'rejected') {
+        invitationQuery.status = 'declined'
+      }
+    }
+
+    const invitations = await Notification.find(invitationQuery)
+      .populate({
+        path: 'recipientId',
+        select: 'email accountType username'
+      })
+      .populate({
+        path: 'batchId',
+        select: 'name department academicYear description'
+      })
+      .sort({ createdAt: -1 })
+      .lean()
+
+    const formattedInvitations = await Promise.all(
+      invitations.map(async notif => {
+        const profile = await TeacherProfile.findOne({
+          userId: notif.recipientId?._id
+        }).select('fullName')
+
+        let normStatus = 'pending'
+        if (notif.status === 'accepted') normStatus = 'approved'
+        else if (notif.status === 'declined') normStatus = 'rejected'
+
+        return {
+          id: notif._id,
+          notificationId: notif._id,
+          type: 'invitation',
+          teacherId: notif.recipientId?._id,
+          teacherName:
+            profile?.fullName ||
+            notif.recipientId?.username ||
+            notif.recipientId?.email ||
+            'Invited Teacher',
+          teacherEmail: notif.recipientId?.email || '',
+          teacherUsername: notif.recipientId?.username || '',
+          batchId: notif.batchId?._id,
+          batchName: notif.batchId?.name || 'Assigned Batch',
+          department: notif.batchId?.department || '',
+          academicYear: notif.batchId?.academicYear || '',
+          status: normStatus, // mapped to 'pending', 'approved', 'rejected'
+          rawStatus: notif.status, // 'unread', 'read', 'accepted', 'declined'
+          createdAt: notif.createdAt
+        }
+      })
+    )
+
+    // Combine and sort
+    let combined = []
+    if (type === 'request') {
+      combined = incomingRequests
+    } else if (type === 'invitation') {
+      combined = formattedInvitations
+    } else {
+      combined = [...incomingRequests, ...formattedInvitations].sort(
+        (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+      )
+    }
+
     res.status(200).json({
       success: true,
-      requests
+      requests: incomingRequests,
+      invitations: formattedInvitations,
+      combined
     })
   } catch (error) {
     console.error(
@@ -1118,7 +1199,7 @@ const getLearnerJoinRequests = async (req, res) => {
       })
         .populate({
           path: 'userId',
-          select: 'email accountType'
+          select: 'email username accountType'
         })
         .populate({
           path: 'institutionId',
@@ -1148,8 +1229,12 @@ const getLearnerJoinRequests = async (req, res) => {
 
           learnerName:
             profile?.fullName ||
+            membership.userId?.username ||
             membership.userId?.email ||
             '',
+
+          learnerUsername:
+            membership.userId?.username || '',
 
           learnerEmail:
             membership.userId?.email || '',
@@ -1394,7 +1479,7 @@ const getApprovedLearners = async (req, res) => {
       })
         .populate({
           path: 'userId',
-          select: 'email accountType'
+          select: 'email username accountType'
         })
         .lean()
 
@@ -1413,8 +1498,11 @@ const getApprovedLearners = async (req, res) => {
           learnerId: membership.userId?._id,
           learnerName:
             profile?.fullName ||
+            membership.userId?.username ||
             membership.userId?.email ||
             '',
+          learnerUsername:
+            membership.userId?.username || '',
           learnerEmail:
             membership.userId?.email || '',
           batchId: membership.batchId,
@@ -1488,12 +1576,13 @@ const getInstituteOverview = async (req, res) => {
       )
     )
 
-    // Count pending teacher batch requests
+    // Count pending teacher batch requests (initiated by teachers, not campus invitations)
     const pendingTeacherRequests =
       await InstitutionMembership.countDocuments({
         institutionId,
         role: 'teacher',
-        status: 'pending'
+        status: 'pending',
+        initiatedBy: { $ne: 'institute' }
       })
 
     res.status(200).json({
@@ -1551,13 +1640,29 @@ const getInstituteBatchOverview = async (req, res) => {
             status: 'approved'
           })
 
-        const learnerCount =
-          await InstitutionMembership.countDocuments({
-            institutionId,
-            batchId: batch._id,
-            role: 'learner',
-            status: 'approved'
+        const learnerMemberships = await InstitutionMembership.find({
+          institutionId,
+          batchId: batch._id,
+          role: 'learner',
+          status: 'approved'
+        }).populate('userId', 'email username').lean()
+
+        const LearnerProfile = require('../models/LearnerProfile')
+
+        const learnersList = await Promise.all(
+          learnerMemberships.map(async m => {
+            const profile = await LearnerProfile.findOne({ userId: m.userId?._id }).select('fullName')
+            return {
+              membershipId: m._id,
+              userId: m.userId?._id,
+              name: profile?.fullName || m.userId?.username || m.userId?.email || 'Enrolled Student',
+              email: m.userId?.email || '',
+              username: m.userId?.username || '',
+              status: m.status,
+              createdAt: m.createdAt
+            }
           })
+        )
 
         return {
           batchId: batch._id,
@@ -1566,7 +1671,7 @@ const getInstituteBatchOverview = async (req, res) => {
           academicYear: batch.academicYear,
           description: batch.description,
           teachers: teacherCount,
-          learners: learnerCount
+          learners: learnersList
         }
       })
     )
@@ -1593,11 +1698,21 @@ const getPublicInstitute = async (req, res) => {
   try {
     const { instituteId } = req.params
 
-    // Find institute account
-    const institute = await User.findOne({
-      _id: instituteId,
-      accountType: 'institute'
-    }).select('_id email')
+    // Find institute account by ObjectId or username
+    let institute = null
+    const mongoose = require('mongoose')
+    if (mongoose.Types.ObjectId.isValid(instituteId)) {
+      institute = await User.findOne({
+        _id: instituteId,
+        accountType: 'institute'
+      }).select('_id email username')
+    }
+    if (!institute) {
+      institute = await User.findOne({
+        username: instituteId.toLowerCase(),
+        accountType: 'institute'
+      }).select('_id email username')
+    }
 
     if (!institute) {
       return res.status(404).json({
@@ -1660,6 +1775,7 @@ const getPublicInstitute = async (req, res) => {
 
       institute: {
         id: institute._id,
+        username: institute.username,
 
         // Public profile
         name: instituteProfile.instituteName,
@@ -1707,11 +1823,21 @@ const getPublicInstituteBatches = async (req, res) => {
   try {
     const { instituteId } = req.params
 
-    // Make sure the institute exists
-    const institute = await User.findOne({
-      _id: instituteId,
-      accountType: 'institute'
-    }).select('_id')
+    // Find institute account by ObjectId or username
+    let institute = null
+    const mongoose = require('mongoose')
+    if (mongoose.Types.ObjectId.isValid(instituteId)) {
+      institute = await User.findOne({
+        _id: instituteId,
+        accountType: 'institute'
+      }).select('_id')
+    }
+    if (!institute) {
+      institute = await User.findOne({
+        username: instituteId.toLowerCase(),
+        accountType: 'institute'
+      }).select('_id')
+    }
 
     if (!institute) {
       return res.status(404).json({

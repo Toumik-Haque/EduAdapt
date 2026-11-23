@@ -297,7 +297,7 @@ function TeacherBatchMembership() {
             <input
               type="text"
               className="form-control"
-              placeholder="Search institution..."
+              placeholder="Search institutions by name, campus type, or location..."
               value={search}
               onChange={handleSearch}
             />

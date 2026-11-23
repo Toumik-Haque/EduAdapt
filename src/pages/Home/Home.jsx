@@ -1,853 +1,277 @@
 import { Link } from 'react-router-dom'
 
-const roles = [
+const workspaceRoles = [
   {
-    icon: "bi-mortarboard-fill",
-    title: "Start Learning",
-    subtitle: "For every learner",
-    text: "Personalized learning journeys that evolve with goals, pace and progress.",
-    color: "#7C3AED",
-    bg: "#F5F3FF",
+    role: "Students & Learners",
+    tagline: "Structured & Independent Learning",
+    description: "Manage institutional batch subjects, download verified lecture resources, turn in assignments, and track personal growth.",
+    icon: "bi-mortarboard",
+    color: "var(--brand-700)",
+    bg: "var(--brand-50)",
+    border: "var(--brand-200)",
+    features: ["Enrolled Campus Coursework", "Independent Study Roadmaps", "Interactive Peer Community", "Direct Submission Feedback"],
+    link: "/register?role=learner"
   },
   {
+    role: "Teachers & Faculty",
+    tagline: "Course Authoring & Assessment",
+    description: "Create and distribute curriculum to campus cohorts, review submissions, assign grades, and publish freelance masterclasses.",
     icon: "bi-person-video3",
-    title: "Start Teaching",
-    subtitle: "For every teacher",
-    text: "Create, teach, assess and guide learners with meaningful insights.",
-    color: "#8B5CF6",
-    bg: "#F5F3FF",
+    color: "#0369A1",
+    bg: "#F0F9FF",
+    border: "#BAE6FD",
+    features: ["Campus Batch Allocations", "Freelance Studio with Code Enrollment", "Grading & Written Feedback", "Faculty Broadcast Bulletins"],
+    link: "/register?role=teacher"
   },
   {
-    icon: "bi-building",
-    title: "Connect Institutions",
-    subtitle: "For connected education",
-    text: "Bring learners and teachers together in one intelligent ecosystem.",
-    color: "#A855F7",
-    bg: "#FAF5FF",
-  },
+    role: "Institutions & Colleges",
+    tagline: "Unified Academic Administration",
+    description: "Orchestrate cohorts, approve student enrollments, assign verified teaching faculty, and manage public organizational branding.",
+    icon: "bi-building-check",
+    color: "#065F46",
+    bg: "#ECFDF5",
+    border: "#A7F3D0",
+    features: ["Departmental Batch Architecture", "Teacher Credential Verification", "Student Admission Approvals", "Live Campus Notices"],
+    link: "/register?role=institute"
+  }
 ];
 
-const steps = [
+const pillars = [
   {
-    number: "01",
-    icon: "bi-book",
-    title: "Learn",
-    text: "Explore lessons, courses and learning resources.",
+    title: "Dual Learning Spaces",
+    desc: "Uniquely engineered to support both accredited university coursework and self-directed freelance courses under one account.",
+    icon: "bi-layers-half"
   },
   {
-    number: "02",
-    icon: "bi-clipboard2-check",
-    title: "Assess",
-    text: "Understand learning through activities and assessments.",
+    title: "Realtime Academic Feed",
+    desc: "A centralized social learning hub where students solve problem sets together and educators answer subject inquiries.",
+    icon: "bi-chat-square-quote"
   },
   {
-    number: "03",
-    icon: "bi-stars",
-    title: "Adapt",
-    text: "Identify learning needs and determine the next step.",
+    title: "Granular Assignment Engine",
+    desc: "Turn in solutions via cloud links or text notes, view instant status transitions, and receive instructor feedback.",
+    icon: "bi-clipboard2-check"
   },
   {
-    number: "04",
-    icon: "bi-graph-up-arrow",
-    title: "Grow",
-    text: "Track progress and continuously improve.",
-  },
-];
-
-const features = [
-  {
-    icon: "bi-person-heart",
-    title: "Learner-Centered",
-    text: "Learning experiences designed around individual needs.",
-  },
-  {
-    icon: "bi-lightning-charge",
-    title: "Adaptive Intelligence",
-    text: "Learning paths can evolve from activity and assessment insights.",
-  },
-  {
-    icon: "bi-people",
-    title: "Connected Ecosystem",
-    text: "Learners, teachers and institutions work within one platform.",
-  },
+    title: "Campus Notice Bulletins",
+    desc: "Targeted announcements pinned by administrators or faculty to keep campus communities informed in real time.",
+    icon: "bi-megaphone"
+  }
 ];
 
 function Home() {
-
   return (
-    <div className="bg-white text-dark">
-
-      {/* =====================================================
-          HERO
-      ====================================================== */}
-      <section
-        className="position-relative overflow-hidden"
-        style={{
-          background:
-            "radial-gradient(circle at 75% 25%, rgba(124,58,237,0.12), transparent 32%), linear-gradient(180deg, #FAF8FF 0%, #FFFFFF 85%)",
-        }}
-      >
-        {/* Decorative grid */}
-        <div
-          className="position-absolute top-0 start-0 w-100 h-100"
-          style={{
-            opacity: 0.35,
-            backgroundImage:
-              "linear-gradient(rgba(124,58,237,0.035) 1px, transparent 1px), linear-gradient(90deg, rgba(124,58,237,0.035) 1px, transparent 1px)",
-            backgroundSize: "42px 42px",
-            pointerEvents: "none",
-          }}
-        />
-
-        {/* Glow */}
-        <div
-          className="position-absolute rounded-circle"
-          style={{
-            width: "420px",
-            height: "420px",
-            right: "-170px",
-            top: "-170px",
-            background: "rgba(168,85,247,0.10)",
-            filter: "blur(15px)",
-          }}
-        />
-
-        <div className="container position-relative py-5">
-          <div
-            className="row align-items-center g-5 py-lg-4 mx-0"
-          >
-
-            {/* HERO CONTENT */}
-            <div className="col-lg-6">
-
-              <div
-                className="d-inline-flex align-items-center gap-2 rounded-pill px-3 py-2 mb-4"
-                style={{
-                  background: "#F5F3FF",
-                  color: "#6D28D9",
-                  border: "1px solid #E9D5FF",
-                  fontSize: "0.82rem",
-                  fontWeight: 600,
-                }}
-              >
+    <div className="bg-white">
+      {/* Hero Section */}
+      <section className="py-5 py-lg-6 border-bottom" style={{ background: '#FAF9FD' }}>
+        <div className="container py-3 py-md-4">
+          <div className="row align-items-center g-5">
+            <div className="col-lg-7">
+              <div className="d-inline-flex align-items-center gap-2 px-3 py-1 rounded-pill bg-white border mb-3 small fw-semibold text-secondary">
                 <span
                   className="rounded-circle"
-                  style={{
-                    width: "7px",
-                    height: "7px",
-                    background: "#8B5CF6",
-                  }}
-                />
-                Adaptive Education Ecosystem
+                  style={{ width: '8px', height: '8px', backgroundColor: 'var(--brand-700)' }}
+                ></span>
+                EduAdapt Enterprise Academic Platform
               </div>
 
               <h1
-                className="fw-bold mb-3"
-                style={{
-                  fontSize: "clamp(2.5rem, 5vw, 4.35rem)",
-                  lineHeight: 1.05,
-                  letterSpacing: "-2.5px",
-                }}
+                className="fw-extrabold text-dark tracking-tight mb-3"
+                style={{ fontSize: 'clamp(2.3rem, 4vw, 3.4rem)', lineHeight: 1.15 }}
               >
-                Education that
-                <span
-                  className="d-block"
-                  style={{
-                    lineHeight: 1.15,
-                    paddingBottom: "0.08em",
-                    background:
-                      "linear-gradient(100deg, #6D28D9, #8B5CF6, #A855F7)",
-                    WebkitBackgroundClip: "text",
-                    WebkitTextFillColor: "transparent",
-                  }}
-                >
-                  adapts to every journey.
-                </span>
+                The synchronized academic platform for{' '}
+                <span style={{ color: 'var(--brand-700)' }}>modern education.</span>
               </h1>
 
-              <p
-                className="text-secondary mb-4"
-                style={{
-                  maxWidth: "560px",
-                  fontSize: "1.05rem",
-                  lineHeight: 1.75,
-                }}
-              >
-                EduAdapt connects learning, teaching, assessment and
-                institutions into one intelligent education ecosystem —
-                helping every learner move forward with a clearer path.
+              <p className="lead text-secondary mb-4" style={{ fontSize: '1.05rem', lineHeight: 1.65 }}>
+                EduAdapt unites students, certified faculty, and educational institutions into one coherent ecosystem.
+                Deliver courses, grade homework, solve doubts collaboratively, and manage campus cohorts without fragmentation.
               </p>
 
               <div className="d-flex flex-wrap gap-3">
-
-                <Link
-                  to="/register"
-                  className="btn text-white px-4 py-3 rounded-3 fw-semibold shadow-sm"
-                  style={{
-                    background:
-                      "linear-gradient(135deg, #6D28D9, #8B5CF6)",
-                    border: "none",
-                  }}
-                >
-                  Get Started
-                  <i className="bi bi-arrow-right ms-2" />
+                <Link to="/register" className="btn-brand-solid">
+                  <span>Create Account</span>
+                  <i className="bi bi-arrow-right"></i>
                 </Link>
-
-                <a
-                  href="#ecosystem"
-                  className="btn bg-white border px-4 py-3 rounded-3 fw-semibold"
-                >
-                  Explore Ecosystem
+                <a href="#workspaces" className="btn-brand-outline">
+                  <span>Explore Workspaces</span>
                 </a>
-
               </div>
-
-              {/* Hero highlights */}
-              <div className="d-flex flex-wrap gap-4 mt-4 pt-2">
-
-                <div className="d-flex align-items-center gap-2">
-                  <i
-                    className="bi bi-check-circle-fill"
-                    style={{ color: "#7C3AED" }}
-                  />
-                  <span className="small text-secondary">
-                    Personalized
-                  </span>
-                </div>
-
-                <div className="d-flex align-items-center gap-2">
-                  <i
-                    className="bi bi-check-circle-fill"
-                    style={{ color: "#7C3AED" }}
-                  />
-                  <span className="small text-secondary">
-                    Adaptive
-                  </span>
-                </div>
-
-                <div className="d-flex align-items-center gap-2">
-                  <i
-                    className="bi bi-check-circle-fill"
-                    style={{ color: "#7C3AED" }}
-                  />
-                  <span className="small text-secondary">
-                    Connected
-                  </span>
-                </div>
-
-              </div>
-
             </div>
 
-
-            {/* =================================================
-                HERO ECOSYSTEM VISUAL
-            ================================================== */}
-            <div className="col-lg-6">
-
-              <div
-                className="position-relative mx-auto"
-                style={{
-                  width: "100%",
-                  maxWidth: "500px",
-                  minHeight: "430px",
-                }}
-              >
-
-                {/* Central ecosystem */}
-                <div
-                  className="position-absolute top-50 start-50 translate-middle rounded-circle d-flex flex-column align-items-center justify-content-center text-center"
-                  style={{
-                    width: "175px",
-                    height: "175px",
-                    background:
-                      "linear-gradient(145deg, #6D28D9, #8B5CF6)",
-                    color: "white",
-                    boxShadow:
-                      "0 25px 60px rgba(109,40,217,0.28)",
-                    zIndex: 3,
-                  }}
-                >
-                  <i className="bi bi-stars fs-2 mb-2" />
-
-                  <div className="fw-bold fs-5">
-                    EduAdapt
-                  </div>
-
-                  <div
-                    className="small mt-1"
-                    style={{ opacity: 0.82 }}
-                  >
-                    Smart Education
-                  </div>
-                </div>
-
-
-                {/* Connection rings */}
-                <div
-                  className="position-absolute top-50 start-50 translate-middle rounded-circle"
-                  style={{
-                    width: "min(250px, 100%)",
-                    height: "min(250px, 100%)",
-                    border: "1px dashed rgba(124,58,237,0.25)",
-                  }}
-                />
-
-                <div
-                  className="position-absolute top-50 start-50 translate-middle rounded-circle"
-                  style={{
-                    width: "min(345px)",
-                    height: "min(345px)",
-                    border: "1px dashed rgba(124,58,237,0.15)",
-                  }}
-                />
-
-
-                {/* Learner */}
-                <div
-                  className="position-absolute bg-white rounded-4 border shadow-sm p-3"
-                  style={{
-                    left: "0",
-                    top: "35px",
-                    width: "min(175px, 49%)",
-                    zIndex: 4,
-                  }}
-                >
-                  <div className="d-flex align-items-center gap-3">
-
-                    <div
-                      className="rounded-3 d-flex align-items-center justify-content-center flex-shrink-0"
-                      style={{
-                        width: "44px",
-                        height: "44px",
-                        background: "#F5F3FF",
-                        color: "#7C3AED",
-                      }}
-                    >
-                      <i className="bi bi-mortarboard-fill fs-5" />
-                    </div>
-
-                    <div>
-                      <div className="fw-bold small">
-                        Learners
-                      </div>
-                      <div
-                        className="text-secondary"
-                        style={{ fontSize: "11px" }}
-                      >
-                        Learn & improve
-                      </div>
-                    </div>
-
-                  </div>
-                </div>
-
-
-                {/* Teacher */}
-                <div
-                  className="position-absolute bg-white rounded-4 border shadow-sm p-3"
-                  style={{
-                    right: "0",
-                    top: "35px",
-                    width: "min(175px, 49%)",
-                    zIndex: 4,
-                  }}
-                >
-                  <div className="d-flex align-items-center gap-3">
-
-                    <div
-                      className="rounded-3 d-flex align-items-center justify-content-center flex-shrink-0"
-                      style={{
-                        width: "44px",
-                        height: "44px",
-                        background: "#FAF5FF",
-                        color: "#8B5CF6",
-                      }}
-                    >
-                      <i className="bi bi-person-video3 fs-5" />
-                    </div>
-
-                    <div>
-                      <div className="fw-bold small">
-                        Teachers
-                      </div>
-                      <div
-                        className="text-secondary"
-                        style={{ fontSize: "11px" }}
-                      >
-                        Teach & guide
-                      </div>
-                    </div>
-
-                  </div>
-                </div>
-
-
-                {/* Institution */}
-                <div
-                  className="position-absolute bg-white rounded-4 border shadow-sm p-3"
-                  style={{
-                    left: "50%",
-                    transform: "translateX(-50%)",
-                    bottom: "10px",
-                    width: "195px",
-                    zIndex: 4,
-                  }}
-                >
-                  <div className="d-flex align-items-center gap-3">
-
-                    <div
-                      className="rounded-3 d-flex align-items-center justify-content-center flex-shrink-0"
-                      style={{
-                        width: "44px",
-                        height: "44px",
-                        background: "#FAF5FF",
-                        color: "#A855F7",
-                      }}
-                    >
-                      <i className="bi bi-building fs-5" />
-                    </div>
-
-                    <div>
-                      <div className="fw-bold small">
-                        Institutions
-                      </div>
-                      <div
-                        className="text-secondary"
-                        style={{ fontSize: "11px" }}
-                      >
-                        Connect & manage
-                      </div>
-                    </div>
-
-                  </div>
-                </div>
-
-              </div>
-
-            </div>
-
-          </div>
-        </div>
-      </section>
-
-
-      {/* =====================================================
-          ECOSYSTEM
-      ====================================================== */}
-      <section className="py-5" id="ecosystem">
-
-        <div className="container py-lg-4">
-
-          <div className="text-center mb-5">
-
-            <div
-              className="small fw-bold mb-2"
-              style={{
-                color: "#7C3AED",
-                letterSpacing: "1.5px",
-              }}
-            >
-              ONE EDUCATION ECOSYSTEM
-            </div>
-
-            <h2 className="fw-bold mb-3">
-              Built for everyone in education
-            </h2>
-
-            <p
-              className="text-secondary mx-auto"
-              style={{
-                maxWidth: "650px",
-                lineHeight: 1.7,
-              }}
-            >
-              A common platform where individual learning, teaching and
-              institutional education can exist together.
-            </p>
-
-          </div>
-
-
-          <div className="row g-4">
-
-            {roles.map((role) => (
-
-              <div className="col-md-4" key={role.title}>
-
-                <Link
-                  to="/register"
-                  className="text-decoration-none text-dark"
-                >
-
-                  <div
-                    className="h-100 rounded-4 p-4 border bg-white"
-                    style={{
-                      transition: "all 0.25s ease",
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.transform =
-                        "translateY(-7px)";
-
-                      e.currentTarget.style.boxShadow =
-                        "0 18px 45px rgba(109,40,217,0.10)";
-
-                      e.currentTarget.style.borderColor =
-                        "#C4B5FD";
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.transform =
-                        "translateY(0)";
-
-                      e.currentTarget.style.boxShadow =
-                        "none";
-
-                      e.currentTarget.style.borderColor =
-                        "#dee2e6";
-                    }}
-                  >
-
-                    <div
-                      className="rounded-4 d-flex align-items-center justify-content-center mb-4"
-                      style={{
-                        width: "58px",
-                        height: "58px",
-                        background: role.bg,
-                        color: role.color,
-                      }}
-                    >
-                      <i className={`bi ${role.icon} fs-4`} />
-                    </div>
-
-                    {/* <div
-                      className="small fw-semibold mb-1"
-                      style={{ color: role.color }}
-                    >
-                      {role.subtitle}
-                    </div> */}
-
-                    <h4 className="fw-bold mb-2">
-                      {role.title}
-                    </h4>
-
-                    <p className="text-secondary mb-4">
-                      {role.text}
-                    </p>
-
-                    <span
-                      className="small fw-semibold"
-                      style={{ color: role.color }}
-                    >
-                      Explore
-                      <i className="bi bi-arrow-right ms-2" />
-                    </span>
-
-                  </div>
-
-                </Link>
-
-              </div>
-
-            ))}
-
-          </div>
-
-        </div>
-      </section>
-
-
-      {/* =====================================================
-          ADAPTIVE SECTION
-      ====================================================== */}
-      <section
-        className="py-5"
-        style={{
-          background:
-            "linear-gradient(180deg, #FAF8FF, #F7F3FF)",
-        }}
-      >
-
-        <div className="container py-lg-4">
-
-          <div className="row align-items-center g-5 mx-0">
-
-            {/* TEXT */}
+            {/* Live System Demonstration Card */}
             <div className="col-lg-5">
-
-              <div
-                className="small fw-bold mb-2"
-                style={{
-                  color: "#7C3AED",
-                  letterSpacing: "1.5px",
-                }}
-              >
-                THE ADAPTIVE LOOP
-              </div>
-
-              <h2 className="fw-bold mb-3">
-                Learning doesn't have to follow
-                <span style={{ color: "#7C3AED" }}>
-                  {" "}one fixed path.
-                </span>
-              </h2>
-
-              <p
-                className="text-secondary"
-                style={{
-                  lineHeight: 1.75,
-                }}
-              >
-                EduAdapt uses learning activity and assessment insights
-                to help determine what the learner should focus on next.
-              </p>
-
-            </div>
-
-
-            {/* STEPS */}
-            <div className="col-lg-7">
-
-              <div className="row g-3">
-
-                {steps.map((step) => (
-
-                  <div className="col-sm-6" key={step.number}>
-
-                    <div
-                      className="bg-white border rounded-4 p-4 h-100"
-                      style={{
-                        transition: "transform 0.2s ease",
-                      }}
+              <div className="card-pro p-4 bg-white shadow-sm">
+                <div className="d-flex align-items-center justify-content-between mb-3 pb-3 border-bottom">
+                  <div className="d-flex align-items-center gap-2">
+                    <span
+                      className="rounded-circle d-flex align-items-center justify-content-center text-white"
+                      style={{ width: '32px', height: '32px', backgroundColor: 'var(--brand-700)' }}
                     >
-
-                      <div className="d-flex justify-content-between mb-4">
-
-                        <div
-                          className="rounded-3 d-flex align-items-center justify-content-center"
-                          style={{
-                            width: "45px",
-                            height: "45px",
-                            background: "#F5F3FF",
-                            color: "#7C3AED",
-                          }}
-                        >
-                          <i className={`bi ${step.icon}`} />
-                        </div>
-
-                        <span
-                          className="small fw-bold"
-                          style={{
-                            color: "#C4B5FD",
-                          }}
-                        >
-                          {step.number}
-                        </span>
-
-                      </div>
-
-                      <h5 className="fw-bold">
-                        {step.title}
-                      </h5>
-
-                      <p className="text-secondary small mb-0">
-                        {step.text}
-                      </p>
-
+                      <i className="bi bi-mortarboard-fill small"></i>
+                    </span>
+                    <div>
+                      <div className="fw-bold small text-dark">Active Campus Stream</div>
+                      <div className="text-muted" style={{ fontSize: '0.7rem' }}>Apex Institute of Technology</div>
                     </div>
-
                   </div>
-
-                ))}
-
-              </div>
-
-            </div>
-
-          </div>
-
-        </div>
-      </section>
-
-
-      {/* =====================================================
-          FEATURES
-      ====================================================== */}
-      <section className="py-5">
-
-        <div className="container py-lg-4">
-
-          <div className="text-center mb-5">
-
-            <div
-              className="small fw-bold mb-2"
-              style={{
-                color: "#7C3AED",
-                letterSpacing: "1.5px",
-              }}
-            >
-              SMART BY DESIGN
-            </div>
-
-            <h2 className="fw-bold mb-3">
-              Technology that stays simple
-            </h2>
-
-            <p
-              className="text-secondary mx-auto"
-              style={{ maxWidth: "600px" }}
-            >
-              Powerful intelligence works behind the scenes while the
-              experience remains clear and human.
-            </p>
-
-          </div>
-
-
-          <div className="row g-4">
-
-            {features.map((feature) => (
-
-              <div className="col-md-4" key={feature.title}>
-
-                <div className="text-center px-3">
-
-                  <div
-                    className="mx-auto mb-3 rounded-4 d-flex align-items-center justify-content-center"
-                    style={{
-                      width: "62px",
-                      height: "62px",
-                      background: "#F5F3FF",
-                      color: "#7C3AED",
-                    }}
-                  >
-                    <i className={`bi ${feature.icon} fs-4`} />
-                  </div>
-
-                  <h5 className="fw-bold">
-                    {feature.title}
-                  </h5>
-
-                  <p className="text-secondary small mb-0">
-                    {feature.text}
-                  </p>
-
+                  <span className="badge-meta badge-meta-emerald">System Live</span>
                 </div>
 
+                <div className="d-flex flex-column gap-3">
+                  <div className="p-3 rounded-3 bg-light border">
+                    <div className="d-flex justify-content-between small mb-1">
+                      <span className="fw-bold text-dark">Computer Science Batch 2026-A</span>
+                      <span className="text-muted">45 Students Active</span>
+                    </div>
+                    <div className="small text-secondary">
+                      Course: <strong>Algorithms & Data Structures</strong> (Dr. Alok Verma)
+                    </div>
+                  </div>
+
+                  <div className="p-3 rounded-3 bg-light border">
+                    <div className="d-flex justify-content-between small mb-1">
+                      <span className="fw-bold text-dark">Recent Assignment Submission</span>
+                      <span className="badge-meta badge-meta-purple">Graded (A)</span>
+                    </div>
+                    <div className="small text-muted">
+                      Assignment #2: Dynamic Programming problem set reviewed with instructor notes.
+                    </div>
+                  </div>
+
+                  <div className="p-3 rounded-3 bg-light border">
+                    <div className="d-flex justify-content-between small mb-1">
+                      <span className="fw-bold text-dark">Community Discussion</span>
+                      <span className="badge-meta badge-meta-sky">12 Replies</span>
+                    </div>
+                    <div className="small text-muted">
+                      "Implementing Dijkstra's shortest path in Python" &bull; Active in #Algorithms
+                    </div>
+                  </div>
+                </div>
               </div>
+            </div>
+          </div>
+        </div>
+      </section>
 
+      {/* Three Workspaces Section */}
+      <section id="workspaces" className="py-5 py-md-6 bg-white border-bottom">
+        <div className="container py-3">
+          <div className="text-center mb-5" style={{ maxWidth: '860px', margin: '0 auto' }}>
+            <span className="badge-meta badge-meta-purple mb-2">Multi-Persona Ecosystem</span>
+            <h2
+              className="fw-extrabold text-dark mb-2"
+              style={{
+                fontSize: 'clamp(1.75rem, 3.2vw, 2.5rem)',
+                lineHeight: 1.22,
+                letterSpacing: '-0.025em'
+              }}
+            >
+              Dedicated workspaces tailored for each role
+            </h2>
+            <p className="text-secondary" style={{ fontSize: '0.95rem', maxWidth: '640px', margin: '0 auto' }}>
+              EduAdapt provides purpose-built tools whether you are learning, instructing, or administering.
+            </p>
+          </div>
+
+          <div className="row g-4">
+            {workspaceRoles.map((role, idx) => (
+              <div key={idx} className="col-12 col-md-4">
+                <div className="card-pro h-100 p-4 p-xl-4 d-flex flex-column justify-content-between">
+                  <div>
+                    <div
+                      className="rounded-3 d-inline-flex align-items-center justify-content-center mb-3"
+                      style={{ width: '44px', height: '44px', backgroundColor: role.bg, color: role.color }}
+                    >
+                      <i className={`bi ${role.icon} fs-5`}></i>
+                    </div>
+                    <h5 className="fw-bold text-dark mb-1">{role.role}</h5>
+                    <div className="small fw-semibold mb-2" style={{ color: role.color }}>
+                      {role.tagline}
+                    </div>
+                    <p className="text-secondary small mb-4">{role.description}</p>
+
+                    <div className="p-3 rounded-3 bg-light mb-4">
+                      <div className="fw-bold small text-dark mb-2" style={{ fontSize: '0.78rem' }}>
+                        Key Capabilities:
+                      </div>
+                      <ul className="list-unstyled mb-0 d-flex flex-column gap-1 small text-secondary">
+                        {role.features.map((f, fi) => (
+                          <li key={fi} className="d-flex align-items-center gap-2">
+                            <i className="bi bi-check2 text-success"></i>
+                            <span>{f}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+
+                  <Link to={role.link} className="btn-brand-outline w-100 small">
+                    <span>Enter {role.role.split(' ')[0]} Workspace</span>
+                    <i className="bi bi-chevron-right small"></i>
+                  </Link>
+                </div>
+              </div>
             ))}
-
           </div>
-
         </div>
       </section>
 
-
-      {/* =====================================================
-          FINAL CTA
-      ====================================================== */}
-      <section className="pb-5">
-
-        <div className="container">
-
-          <div
-            className="position-relative overflow-hidden rounded-4 p-4 p-md-5 text-center"
-            style={{
-              background:
-                "linear-gradient(135deg, #4C1D95, #6D28D9 45%, #8B5CF6)",
-              color: "white",
-            }}
-          >
-
-            {/* Decorative circles */}
-            <div
-              className="position-absolute rounded-circle"
-              style={{
-                width: "260px",
-                height: "260px",
-                top: "-160px",
-                right: "-80px",
-                background: "rgba(255,255,255,0.08)",
-              }}
-            />
-
-            <div
-              className="position-absolute rounded-circle"
-              style={{
-                width: "200px",
-                height: "200px",
-                bottom: "-130px",
-                left: "-60px",
-                background: "rgba(255,255,255,0.06)",
-              }}
-            />
-
-            <div className="position-relative">
-
-              <i className="bi bi-stars fs-2" />
-
-              <h2 className="fw-bold mt-3 mb-2">
-                Start your learning journey.
-              </h2>
-
-              <p
-                className="mb-4"
-                style={{ opacity: 0.88 }}
-              >
-                Learn. Assess. Adapt. Grow.
-              </p>
-
-              <Link
-                to="/register"
-                className="btn btn-light px-4 py-3 rounded-3 fw-semibold"
-              >
-                Join EduAdapt
-                <i className="bi bi-arrow-right ms-2" />
-              </Link>
-
-            </div>
-
+      {/* Platform Pillars */}
+      <section className="py-5 py-md-6" style={{ background: '#FAF9FD' }}>
+        <div className="container py-3">
+          <div className="text-center mb-5" style={{ maxWidth: '600px', margin: '0 auto' }}>
+            <span className="badge-meta badge-meta-purple mb-2">Platform Capabilities</span>
+            <h2 className="fw-extrabold text-dark mb-2">Engineered for academic productivity</h2>
+            <p className="text-secondary small">
+              Built on dependable workflows, secure authentication, and seamless user experiences.
+            </p>
           </div>
 
+          <div className="row g-4">
+            {pillars.map((pil, idx) => (
+              <div key={idx} className="col-12 col-sm-6 col-lg-3">
+                <div className="card-pro h-100 p-4 bg-white">
+                  <div
+                    className="rounded-2 d-inline-flex align-items-center justify-content-center mb-3"
+                    style={{
+                      width: '40px',
+                      height: '40px',
+                      backgroundColor: 'var(--brand-50)',
+                      color: 'var(--brand-700)',
+                    }}
+                  >
+                    <i className={`bi ${pil.icon} fs-5`}></i>
+                  </div>
+                  <h6 className="fw-bold text-dark mb-2">{pil.title}</h6>
+                  <p className="text-secondary small mb-0">{pil.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
-
       </section>
 
-
-      {/* =====================================================
-          FOOTER
-      ====================================================== */}
-      <footer className="border-top py-4">
-
-        <div className="container">
-
-          <div
-            className="d-flex flex-column flex-md-row justify-content-between align-items-center gap-2"
-          >
-
-            <div className="fw-bold">
-              <span style={{ color: "#7C3AED" }}>
-                Edu
-              </span>
-              Adapt
-            </div>
-
-            <div className="text-secondary small">
-              Learn • Teach • Adapt • Grow
-            </div>
-
-            <div className="text-secondary small">
-              © {new Date().getFullYear()} EduAdapt
-            </div>
-
+      {/* Call to Action Banner */}
+      <section className="py-5 bg-white border-top">
+        <div className="container text-center py-4">
+          <h3 className="fw-bold text-dark mb-2">Join the connected EduAdapt community</h3>
+          <p className="text-secondary small mb-4" style={{ maxWidth: '500px', margin: '0 auto' }}>
+            Experience streamlined campus management and personalized learning today.
+          </p>
+          <div className="d-flex justify-content-center gap-3">
+            <Link to="/register" className="btn-brand-solid">
+              Register Free
+            </Link>
+            <Link to="/login" className="btn-brand-outline">
+              Sign In
+            </Link>
           </div>
-
         </div>
-
-      </footer>
-
+      </section>
     </div>
-  );
+  )
 }
 
-export default Home;
+export default Home

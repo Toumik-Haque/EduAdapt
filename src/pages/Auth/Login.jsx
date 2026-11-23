@@ -9,6 +9,7 @@ function Login() {
 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
@@ -51,24 +52,21 @@ function Login() {
 
   return (
     <main
-      className="d-flex align-items-center py-5 py-lg-5"
+      className="d-flex align-items-center justify-content-center py-4"
       style={{
-        background: '#F8F7FC'
+        minHeight: 'calc(100vh - 64px)',
+        background: 'linear-gradient(180deg, #F8FAFC 0%, #EEF2F6 100%)'
       }}
     >
-      <div className="container px-3">
-
-        <div className="row justify-content-center align-items-stretch g-0">
-
+      <div className="container px-3 px-sm-4" style={{ maxWidth: '920px' }}>
+        <div className="row justify-content-center align-items-stretch g-0 shadow-lg rounded-4 overflow-hidden border bg-white">
           {/* Left Brand Panel */}
           <div className="col-lg-5 d-none d-lg-flex">
             <div
-              className="w-100 d-flex flex-column justify-content-between p-5"
+              className="w-100 d-flex flex-column justify-content-between p-4 p-xl-5"
               style={{
                 background:
                   'linear-gradient(145deg, #5B21B6 0%, #7C3AED 55%, #8B5CF6 100%)',
-                borderRadius: '24px 0 0 24px',
-                minHeight: '560px',
                 color: '#FFFFFF',
                 position: 'relative',
                 overflow: 'hidden'
@@ -174,7 +172,7 @@ function Login() {
                       fontSize: '0.95rem'
                     }}
                   >
-                    Learn, teach, and manage education through one
+                    Learn, teach and manage education through one
                     connected ecosystem designed around individual needs.
                   </p>
                 </div>
@@ -253,18 +251,12 @@ function Login() {
           </div>
 
           {/* Login Panel */}
-          <div className="col-lg-5">
+          <div className="col-12 col-lg-7 d-flex align-items-center">
 
             <div
-              className="h-100"
-              style={{
-                background: '#FFFFFF',
-                border: '1px solid #EAE5F4',
-                borderRadius: '0 24px 24px 0',
-                boxShadow: '0 18px 50px rgba(39, 20, 70, 0.07)'
-              }}
+              className="w-100 bg-white"
             >
-              <div className="p-4 p-md-5">
+              <div className="p-4 p-lg-4 p-xl-5">
 
                 {/* Header */}
                 <div className="mb-4">
@@ -291,7 +283,7 @@ function Login() {
                       letterSpacing: '-0.7px'
                     }}
                   >
-                    Sign in to EduAdapt
+                    Login to EduAdapt
                   </h2>
 
                   <p
@@ -337,7 +329,7 @@ function Login() {
                         fontSize: '0.84rem'
                       }}
                     >
-                      Email Address
+                      Email Address <span className="required-star">*</span>
                     </label>
 
                     <div className="position-relative">
@@ -381,7 +373,7 @@ function Login() {
                           fontSize: '0.84rem'
                         }}
                       >
-                        Password
+                        Password <span className="required-star">*</span>
                       </label>
 
                       <Link
@@ -412,7 +404,7 @@ function Login() {
                       />
 
                       <input
-                        type="password"
+                        type={showPassword ? 'text' : 'password'}
                         className="form-control"
                         placeholder="Enter your password"
                         value={password}
@@ -420,8 +412,23 @@ function Login() {
                           setPassword(event.target.value)
                         }
                         required
-                        style={inputStyle}
+                        style={{ ...inputStyle, paddingRight: '42px' }}
                       />
+
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="btn position-absolute border-0 p-0 text-secondary"
+                        style={{
+                          right: '14px',
+                          top: '50%',
+                          transform: 'translateY(-50%)',
+                          zIndex: 3
+                        }}
+                        title={showPassword ? 'Hide password' : 'Show password'}
+                      >
+                        <i className={`bi ${showPassword ? 'bi-eye-slash-fill' : 'bi-eye-fill'} text-secondary`}></i>
+                      </button>
 
                     </div>
 
@@ -455,7 +462,7 @@ function Login() {
                       </>
                     ) : (
                       <>
-                        Sign In
+                        Login Now
                         <i className="bi bi-arrow-right"></i>
                       </>
                     )}

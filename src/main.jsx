@@ -7,12 +7,15 @@ import './index.css'
 import App from './App.jsx'
 import { AuthProvider } from './context/AuthContext.jsx'
 import { SpaceProvider } from './context/SpaceContext'
+import { ModalProvider } from './context/ModalContext'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <AuthProvider>
       <SpaceProvider>
-        <App />
+        <ModalProvider>
+          <App />
+        </ModalProvider>
       </SpaceProvider>
     </AuthProvider>
   </StrictMode>,

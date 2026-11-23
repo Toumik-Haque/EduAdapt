@@ -1,6 +1,8 @@
 import { Link } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import { useAuth } from '../../context/AuthContext'
+import InteractiveNoticeBoard from '../../components/InteractiveNoticeBoard/InteractiveNoticeBoard'
+import StudentStudyTracker from '../../components/StudentStudyTracker/StudentStudyTracker'
 
 function Learner() {
   const { token, user } = useAuth()
@@ -54,86 +56,58 @@ function Learner() {
         background: '#F8F7FC'
       }}
     >
-      <div className="container py-4 py-md-5 px-3">
+      <div className="container-fluid px-0">
 
         {/* ================= HEADER ================= */}
         <div className="mb-4">
 
-          <div className="d-flex justify-content-between align-items-center gap-3 flex-wrap mb-4">
+          <div className="d-flex justify-content-between align-items-center gap-3 flex-wrap mb-3">
 
             {/* Section label */}
-            <div
-              className="d-inline-flex align-items-center gap-2 px-3 py-2 rounded-pill"
-              style={{
-                background: '#F5F3FF',
-                color: '#6D28D9',
-                border: '1px solid #E9D5FF',
-                fontSize: '0.72rem',
-                fontWeight: 700,
-                letterSpacing: '0.6px'
-              }}
-            >
-              <i className="bi bi-stars"></i>
-              LEARNING ECOSYSTEM
+            <div className="badge-meta badge-meta-purple">
+              <i className="bi bi-mortarboard-fill"></i>
+              <span>STUDENT DASHBOARD</span>
             </div>
 
             {/* Profile */}
             <Link
               to="/learner/profile"
-              className="d-inline-flex align-items-center gap-2 text-decoration-none"
-              style={{
-                background: '#FFFFFF',
-                color: '#5B21B6',
-                border: '1px solid #E9E5F0',
-                borderRadius: '10px',
-                padding: '7px 13px',
-                fontSize: '0.8rem',
-                fontWeight: 600,
-                transition: 'all 0.2s ease'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.borderColor = '#C4B5FD'
-                e.currentTarget.style.background = '#FAF8FF'
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.borderColor = '#E9E5F0'
-                e.currentTarget.style.background = '#FFFFFF'
-              }}
+              className="btn btn-sm btn-light border rounded-pill px-3 py-1 text-secondary"
             >
-              <i className="bi bi-person-circle"></i>
-              Edit Profile
+              <i className="bi bi-person-circle me-1"></i>
+              <span>Account Settings</span>
             </Link>
 
           </div>
 
           <div style={{ maxWidth: '700px' }}>
 
-            <h1
-              className="fw-bold mb-2"
+            <h2
+              className="fw-extrabold mb-1 text-dark"
               style={{
-                color: '#18181B',
-                fontSize: 'clamp(1.8rem, 3vw, 2.45rem)',
-                letterSpacing: '-1px',
-                lineHeight: 1.15
+                letterSpacing: '-0.02em',
+                lineHeight: 1.2
               }}
             >
-              Hi, {user?.profile?.fullName}
-            </h1>
+              Welcome back, {user?.name || user?.profile?.fullName || 'Student'}
+            </h2>
 
-            <p
-              className="mb-0"
-              style={{
-                color: '#71717A',
-                fontSize: '0.94rem',
-                lineHeight: 1.6
-              }}
-            >
-              Choose a learning space and continue your journey
-              with EduAdapt.
+            <p className="text-secondary small mb-0">
+              Continue your academic batches, manage independent study courses, and collaborate with your peers.
             </p>
 
           </div>
 
+        </div>
+
+        {/* ================= INTERACTIVE WIDGETS ================= */}
+        <div className="row g-4 mb-4">
+          <div className="col-12 col-lg-7">
+            <StudentStudyTracker />
+          </div>
+          <div className="col-12 col-lg-5">
+            <InteractiveNoticeBoard />
+          </div>
         </div>
 
         {/* ================= LOADING ================= */}

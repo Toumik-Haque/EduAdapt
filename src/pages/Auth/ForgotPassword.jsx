@@ -9,6 +9,8 @@ function ForgotPassword() {
   const [newPassword, setNewPassword] = useState('')
   const [confirmNewPassword, setConfirmNewPassword] =
     useState('')
+  const [showNewPassword, setShowNewPassword] = useState(false)
+  const [showConfirmNewPassword, setShowConfirmNewPassword] = useState(false)
 
   const [otpSent, setOtpSent] = useState(false)
   const [sendingOTP, setSendingOTP] = useState(false)
@@ -543,7 +545,7 @@ function ForgotPassword() {
                         fontSize: '0.84rem'
                       }}
                     >
-                      Registered Email Address
+                      Registered Email Address <span className="required-star">*</span>
                     </label>
 
                     <div className="row g-2">
@@ -661,7 +663,7 @@ function ForgotPassword() {
                             fontSize: '0.84rem'
                           }}
                         >
-                          Email OTP
+                          Email OTP <span className="required-star">*</span>
                         </label>
 
                         <div className="position-relative">
@@ -751,7 +753,7 @@ function ForgotPassword() {
                             fontSize: '0.84rem'
                           }}
                         >
-                          New Password
+                          New Password <span className="required-star">*</span>
                         </label>
 
                         <div className="position-relative">
@@ -769,7 +771,7 @@ function ForgotPassword() {
                           />
 
                           <input
-                            type="password"
+                            type={showNewPassword ? 'text' : 'password'}
                             className="form-control"
                             placeholder="Minimum 6 characters"
                             value={newPassword}
@@ -778,8 +780,23 @@ function ForgotPassword() {
                                 event.target.value
                               )
                             }
-                            style={inputStyle}
+                            style={{ ...inputStyle, paddingRight: '42px' }}
                           />
+
+                          <button
+                            type="button"
+                            onClick={() => setShowNewPassword(!showNewPassword)}
+                            className="btn position-absolute border-0 p-0 text-secondary"
+                            style={{
+                              right: '14px',
+                              top: '50%',
+                              transform: 'translateY(-50%)',
+                              zIndex: 3
+                            }}
+                            title={showNewPassword ? 'Hide password' : 'Show password'}
+                          >
+                            <i className={`bi ${showNewPassword ? 'bi-eye-slash-fill' : 'bi-eye-fill'} text-secondary`}></i>
+                          </button>
 
                         </div>
 
@@ -795,7 +812,7 @@ function ForgotPassword() {
                             fontSize: '0.84rem'
                           }}
                         >
-                          Confirm New Password
+                          Confirm New Password <span className="required-star">*</span>
                         </label>
 
                         <div className="position-relative">
@@ -813,7 +830,7 @@ function ForgotPassword() {
                           />
 
                           <input
-                            type="password"
+                            type={showConfirmNewPassword ? 'text' : 'password'}
                             className="form-control"
                             placeholder="Re-enter your new password"
                             value={confirmNewPassword}
@@ -822,8 +839,23 @@ function ForgotPassword() {
                                 event.target.value
                               )
                             }
-                            style={inputStyle}
+                            style={{ ...inputStyle, paddingRight: '42px' }}
                           />
+
+                          <button
+                            type="button"
+                            onClick={() => setShowConfirmNewPassword(!showConfirmNewPassword)}
+                            className="btn position-absolute border-0 p-0 text-secondary"
+                            style={{
+                              right: '14px',
+                              top: '50%',
+                              transform: 'translateY(-50%)',
+                              zIndex: 3
+                            }}
+                            title={showConfirmNewPassword ? 'Hide password' : 'Show password'}
+                          >
+                            <i className={`bi ${showConfirmNewPassword ? 'bi-eye-slash-fill' : 'bi-eye-fill'} text-secondary`}></i>
+                          </button>
 
                         </div>
 

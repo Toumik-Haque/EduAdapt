@@ -2,11 +2,13 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import ScrollToTop from '../components/ScrollToTop/ScrollToTop'
 
 import Navbar from '../components/Navbar/Navbar'
+import DashboardLayout from '../components/DashboardLayout/DashboardLayout'
 import Home from '../pages/Home/Home'
 import Register from '../pages/Auth/Register'
 import Login from '../pages/Auth/Login'
 import ForgotPassword from '../pages/Auth/ForgotPassword'
 import InstitutePublicProfile from '../pages/InstitutePublic/InstitutePublicProfile'
+import UserPublicProfile from '../pages/UserPublic/UserPublicProfile'
 
 import Profile from '../pages/Profile/Profile'
 
@@ -21,6 +23,13 @@ import TeacherInstitution from '../pages/TeacherInstitution/TeacherInstitution'
 
 import Institute from '../pages/Institute/Institute'
 import InstituteProfileEdit from '../pages/Institute/InstituteProfileEdit'
+import ManageBatches from '../pages/Institute/ManageBatches'
+import ManageTeachers from '../pages/Institute/ManageTeachers'
+import ManageStudents from '../pages/Institute/ManageStudents'
+import BatchDetails from '../pages/Institute/BatchDetails'
+import TestLogo from '../pages/TestLogo/TestLogo'
+import Community from '../pages/Community/Community'
+import FloatingExitTestButton from '../components/FloatingExitTestButton/FloatingExitTestButton'
 
 import ProtectedRoute from './ProtectedRoute'
 import PublicOnlyRoute from './PublicOnlyRoute'
@@ -29,11 +38,9 @@ function AppRoutes() {
   return (
     <BrowserRouter>
       <ScrollToTop />
-
       <Navbar />
 
       <Routes>
-
         <Route path="/" element={<Home />} />
 
         <Route
@@ -63,11 +70,14 @@ function AppRoutes() {
           }
         />
 
+        {/* Learner Dashboard Routes */}
         <Route
           path="/learner"
           element={
             <ProtectedRoute allowedAccountType="learner">
-              <Learner />
+              <DashboardLayout>
+                <Learner />
+              </DashboardLayout>
             </ProtectedRoute>
           }
         />
@@ -75,7 +85,9 @@ function AppRoutes() {
           path="/learner/profile"
           element={
             <ProtectedRoute allowedAccountType="learner">
-              <Profile />
+              <DashboardLayout>
+                <Profile />
+              </DashboardLayout>
             </ProtectedRoute>
           }
         />
@@ -83,7 +95,9 @@ function AppRoutes() {
           path="/learner/individual"
           element={
             <ProtectedRoute allowedAccountType="learner">
-              <IndividualLearning />
+              <DashboardLayout>
+                <IndividualLearning />
+              </DashboardLayout>
             </ProtectedRoute>
           }
         />
@@ -91,7 +105,9 @@ function AppRoutes() {
           path="/learner/institute/:instituteId"
           element={
             <ProtectedRoute allowedAccountType="learner">
-              <InstitutionLearning />
+              <DashboardLayout>
+                <InstitutionLearning />
+              </DashboardLayout>
             </ProtectedRoute>
           }
         />
@@ -99,16 +115,21 @@ function AppRoutes() {
           path="/learner/institutions"
           element={
             <ProtectedRoute allowedAccountType="learner">
-              <JoinInstitution />
+              <DashboardLayout>
+                <JoinInstitution />
+              </DashboardLayout>
             </ProtectedRoute>
           }
         />
 
+        {/* Teacher Dashboard Routes */}
         <Route
           path="/teacher"
           element={
             <ProtectedRoute allowedAccountType="teacher">
-              <Teacher />
+              <DashboardLayout>
+                <Teacher />
+              </DashboardLayout>
             </ProtectedRoute>
           }
         />
@@ -116,7 +137,9 @@ function AppRoutes() {
           path="/teacher/profile"
           element={
             <ProtectedRoute allowedAccountType="teacher">
-              <Profile />
+              <DashboardLayout>
+                <Profile />
+              </DashboardLayout>
             </ProtectedRoute>
           }
         />
@@ -124,7 +147,9 @@ function AppRoutes() {
           path="/teacher/individual"
           element={
             <ProtectedRoute allowedRoles={['teacher']}>
-              <TeacherIndividual />
+              <DashboardLayout>
+                <TeacherIndividual />
+              </DashboardLayout>
             </ProtectedRoute>
           }
         />
@@ -132,7 +157,9 @@ function AppRoutes() {
           path="/teacher/institute/:instituteId"
           element={
             <ProtectedRoute allowedRoles={['teacher']}>
-              <TeacherInstitution />
+              <DashboardLayout>
+                <TeacherInstitution />
+              </DashboardLayout>
             </ProtectedRoute>
           }
         />
@@ -140,42 +167,113 @@ function AppRoutes() {
           path="/teacher/join-institute"
           element={
             <ProtectedRoute allowedAccountType="teacher">
-              <JoinInstitution />
+              <DashboardLayout>
+                <JoinInstitution />
+              </DashboardLayout>
             </ProtectedRoute>
           }
         />
 
+        {/* Institute Dashboard Routes */}
         <Route
           path="/institute"
           element={
             <ProtectedRoute allowedAccountType="institute">
-              <Institute />
+              <DashboardLayout>
+                <Institute />
+              </DashboardLayout>
             </ProtectedRoute>
           }
         />
-        {/* <Route
-          path="/institute/profile"
+        <Route
+          path="/institute/batches"
           element={
             <ProtectedRoute allowedAccountType="institute">
-              <Profile />
+              <DashboardLayout>
+                <ManageBatches />
+              </DashboardLayout>
             </ProtectedRoute>
           }
-        /> */}
+        />
+        <Route
+          path="/institute/batches/:batchId"
+          element={
+            <ProtectedRoute allowedAccountType="institute">
+              <DashboardLayout>
+                <BatchDetails />
+              </DashboardLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/institute/teachers"
+          element={
+            <ProtectedRoute allowedAccountType="institute">
+              <DashboardLayout>
+                <ManageTeachers />
+              </DashboardLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/institute/students"
+          element={
+            <ProtectedRoute allowedAccountType="institute">
+              <DashboardLayout>
+                <ManageStudents />
+              </DashboardLayout>
+            </ProtectedRoute>
+          }
+        />
         <Route
           path="/institute/profile"
           element={
             <ProtectedRoute allowedRoles={['institute']}>
-              <InstituteProfileEdit />
+              <DashboardLayout>
+                <InstituteProfileEdit />
+              </DashboardLayout>
             </ProtectedRoute>
           }
+        />
+
+        {/* Public Institution Profile (Username-first with legacy fallback) */}
+        <Route
+          path="/institute/:username"
+          element={<InstitutePublicProfile />}
         />
         <Route
           path="/institutions/:instituteId"
           element={<InstitutePublicProfile />}
         />
 
+        {/* Public Teacher Profile (by username, with legacy fallback) */}
+        <Route
+          path="/teacher/:username"
+          element={<UserPublicProfile />}
+        />
+        <Route
+          path="/users/:userId"
+          element={<UserPublicProfile />}
+        />
+
+        {/* Global Community & Social Learning Feed */}
+        <Route
+          path="/community"
+          element={
+            <ProtectedRoute>
+              <DashboardLayout>
+                <Community />
+              </DashboardLayout>
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Brandmark Test & Showcase */}
+        <Route path="/test-logo" element={<TestLogo />} />
       </Routes>
 
+      {/* Floating Movable Test Hub & Exit Button (Inside Router Context) */}
+      <FloatingExitTestButton testServerPort={5050} />
     </BrowserRouter>
   )
 }

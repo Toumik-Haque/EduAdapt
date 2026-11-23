@@ -491,7 +491,7 @@ function JoinInstitution() {
               <input
                 type="text"
                 className="form-control rounded-3"
-                placeholder="Search institution..."
+                placeholder="Search institutions by name, campus type, or location..."
                 value={search}
                 onChange={(e) =>
                   setSearch(e.target.value)
@@ -661,7 +661,13 @@ function JoinInstitution() {
                               <div>
 
                                 <h5 className="fw-semibold mb-1">
-                                  {institution.instituteName}
+                                  <Link
+                                    to={`/institute/${institution.username || institution.id}`}
+                                    className="text-dark text-decoration-none hover-primary"
+                                    title="View Campus Public Profile"
+                                  >
+                                    {institution.instituteName}
+                                  </Link>
                                 </h5>
 
                                 <p

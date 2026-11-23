@@ -30,7 +30,9 @@ const {
   getInstituteProfile,
   updateInstituteProfile,
   uploadInstituteProfilePhoto,
-  uploadInstituteCoverPhoto
+  uploadInstituteCoverPhoto,
+  deleteInstituteProfilePhoto,
+  deleteInstituteCoverPhoto
 } = require('../controllers/instituteProfileController')
 
 const upload = require('../middleware/upload')
@@ -175,11 +177,21 @@ router.post(
   upload.single('profilePhoto'),
   uploadInstituteProfilePhoto
 )
+router.delete(
+  '/institute/profile/photo',
+  protect,
+  deleteInstituteProfilePhoto
+)
 router.post(
   '/institute/profile/cover',
   protect,
   upload.single('coverPhoto'),
   uploadInstituteCoverPhoto
+)
+router.delete(
+  '/institute/profile/cover',
+  protect,
+  deleteInstituteCoverPhoto
 )
 
 module.exports = router

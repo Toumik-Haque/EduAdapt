@@ -8,7 +8,10 @@ const {
   loginUser,
   getCurrentUser,
   getMyProfile,
-  updateMyProfile
+  updateMyProfile,
+  deleteAccount,
+  searchPublicProfiles,
+  getPublicUserProfile
 } = require('../controllers/authController')
 
 const protect = require('../middleware/authMiddleware')
@@ -22,6 +25,11 @@ router.get('/me', protect, getCurrentUser)
 
 router.get('/profile', protect, getMyProfile)
 router.patch('/profile', protect, updateMyProfile)
+router.delete('/delete-account', protect, deleteAccount)
+
+// Public Search & Profile Inspection (search supports optional auth or guest lookup)
+router.get('/search-profiles', searchPublicProfiles)
+router.get('/public/user/:userId', getPublicUserProfile)
 
 router.post(
   '/send-registration-otp',

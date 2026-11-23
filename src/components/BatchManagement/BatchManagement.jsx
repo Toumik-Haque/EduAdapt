@@ -1,12 +1,18 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
+import { Link } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
+import { useModal } from '../../context/ModalContext'
 
 function BatchManagement() {
   const { token } = useAuth()
+  const { showConfirm, showAlert } = useModal()
+  const formRef = useRef(null)
 
   const [batches, setBatches] = useState([])
   const [loading, setLoading] = useState(true)
-  const [creating, setCreating] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
+  const [deletingId, setDeletingId] = useState(null)
+  const [editingBatchId, setEditingBatchId] = useState(null)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
 
@@ -61,7 +67,34 @@ function BatchManagement() {
     })
   }
 
-  const handleCreate = async (e) => {
+  const handleEditClick = (batch) => {
+    setError('')
+    setSuccess('')
+    setEditingBatchId(batch._id)
+    setFormData({
+      name: batch.name || '',
+      department: batch.department || '',
+      academicYear: batch.academicYear || '',
+      description: batch.description || ''
+    })
+    if (formRef.current) {
+      formRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }
+  }
+
+  const handleCancelEdit = () => {
+    setEditingBatchId(null)
+    setFormData({
+      name: '',
+      department: '',
+      academicYear: '',
+      description: ''
+    })
+    setError('')
+    setSuccess('')
+  }
+
+  const handleSubmit = async (e) => {
     e.preventDefault()
 
     setError('')
@@ -73,29 +106,36 @@ function BatchManagement() {
     }
 
     try {
-      setCreating(true)
+      setSubmitting(true)
 
-      const response = await fetch(
-        'http://localhost:5000/api/batches',
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`
-          },
-          body: JSON.stringify(formData)
-        }
-      )
+      const url = editingBatchId
+        ? `http://localhost:5000/api/batches/${editingBatchId}`
+        : 'http://localhost:5000/api/batches'
+      const method = editingBatchId ? 'PUT' : 'POST'
 
-      const data = await response.json()
+      const response = await fetch(url, {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify(formData)
+      })
+
+      let data = {}
+      try {
+        data = await response.json()
+      } catch (jsonErr) {
+        console.warn('Non-JSON response received:', jsonErr)
+      }
 
       if (!response.ok) {
         throw new Error(
-          data.message || 'Failed to create batch'
+          data.message || (editingBatchId ? 'Failed to update batch' : 'Failed to create batch')
         )
       }
 
-      setSuccess('Batch created successfully')
+      setSuccess(editingBatchId ? 'Batch updated successfully' : 'Batch created successfully')
 
       setFormData({
         name: '',
@@ -103,13 +143,66 @@ function BatchManagement() {
         academicYear: '',
         description: ''
       })
+      setEditingBatchId(null)
 
       fetchBatches()
     } catch (error) {
-      console.error('Create batch error:', error)
+      console.error('Submit batch error:', error)
       setError(error.message)
     } finally {
-      setCreating(false)
+      setSubmitting(false)
+    }
+  }
+
+  const handleDeleteBatch = async (batch) => {
+    setError('')
+    setSuccess('')
+
+    const confirmed = await showConfirm(
+      `Are you sure you want to delete the batch "${batch.name}"? Only empty batches with no enrolled members or materials can be deleted.`,
+      'Delete Batch',
+      'danger',
+      'Delete Batch',
+      'Keep Batch'
+    )
+
+    if (!confirmed) return
+
+    try {
+      setDeletingId(batch._id)
+
+      const response = await fetch(`http://localhost:5000/api/batches/${batch._id}`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
+
+      let data = {}
+      try {
+        data = await response.json()
+      } catch (err) {
+        console.warn('Non-JSON response:', err)
+      }
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to delete batch')
+      }
+
+      // If this batch was currently being edited, cancel edit mode
+      if (editingBatchId === batch._id) {
+        handleCancelEdit()
+      }
+
+      setSuccess(`Batch "${batch.name}" was deleted successfully.`)
+      showAlert(`Batch "${batch.name}" has been deleted successfully.`, 'Batch Deleted', 'success')
+      fetchBatches()
+    } catch (err) {
+      console.error('Delete batch error:', err)
+      setError(err.message)
+      showAlert(err.message, 'Cannot Delete Batch', 'warning')
+    } finally {
+      setDeletingId(null)
     }
   }
 
@@ -220,57 +313,83 @@ function BatchManagement() {
       )}
 
       {/* =====================================================
-          CREATE BATCH
+          CREATE OR EDIT BATCH FORM
       ===================================================== */}
       <div
+        ref={formRef}
         className="card border-0 mb-4"
         style={{
           borderRadius: '14px',
-          border: '1px solid #E4E4E7',
-          boxShadow: '0 2px 8px rgba(24, 24, 27, 0.03)'
+          border: editingBatchId ? '1px solid #C4B5FD' : '1px solid #E4E4E7',
+          boxShadow: editingBatchId
+            ? '0 4px 14px rgba(124, 58, 237, 0.08)'
+            : '0 2px 8px rgba(24, 24, 27, 0.03)',
+          transition: 'all 0.2s ease'
         }}
       >
 
         <div className="card-body p-3 p-md-4">
 
-          <div className="d-flex align-items-center gap-2 mb-3">
-
-            <div
-              className="d-flex align-items-center justify-content-center"
-              style={{
-                width: '32px',
-                height: '32px',
-                borderRadius: '9px',
-                background: '#F5F3FF',
-                color: '#7C3AED'
-              }}
-            >
-              <i className="bi bi-plus-lg" />
-            </div>
-
-            <div>
-              <h6
-                className="fw-semibold mb-0"
-                style={{
-                  color: '#18181B'
-                }}
-              >
-                Create New Batch
-              </h6>
-
+          <div className="d-flex align-items-center justify-content-between mb-3">
+            <div className="d-flex align-items-center gap-2">
               <div
+                className="d-flex align-items-center justify-content-center"
                 style={{
-                  color: '#71717A',
-                  fontSize: '12px'
+                  width: '32px',
+                  height: '32px',
+                  borderRadius: '9px',
+                  background: '#F5F3FF',
+                  color: '#7C3AED'
                 }}
               >
-                Add a new learning space to your institution.
+                <i className={editingBatchId ? 'bi bi-pencil-square' : 'bi bi-plus-lg'} />
+              </div>
+
+              <div>
+                <h6
+                  className="fw-semibold mb-0"
+                  style={{
+                    color: '#18181B'
+                  }}
+                >
+                  {editingBatchId ? 'Edit Batch' : 'Create New Batch'}
+                </h6>
+
+                <div
+                  style={{
+                    color: '#71717A',
+                    fontSize: '12px'
+                  }}
+                >
+                  {editingBatchId
+                    ? 'Update learning space details and save changes.'
+                    : 'Add a new learning space to your institution.'}
+                </div>
               </div>
             </div>
 
+            {editingBatchId && (
+              <button
+                type="button"
+                onClick={handleCancelEdit}
+                className="btn btn-sm d-flex align-items-center gap-1"
+                style={{
+                  background: '#F4F4F5',
+                  color: '#52525B',
+                  borderRadius: '8px',
+                  fontSize: '12px',
+                  fontWeight: '500',
+                  padding: '6px 12px',
+                  cursor: 'pointer'
+                }}
+              >
+                <i className="bi bi-x-lg" />
+                Cancel Edit
+              </button>
+            )}
           </div>
 
-          <form onSubmit={handleCreate}>
+          <form onSubmit={handleSubmit}>
 
             <div className="row g-3">
 
@@ -285,7 +404,7 @@ function BatchManagement() {
                     fontWeight: '500'
                   }}
                 >
-                  Batch Name
+                  Batch Name <span className="required-star">*</span>
                 </label>
 
                 <div className="input-group">
@@ -330,7 +449,7 @@ function BatchManagement() {
                     fontWeight: '500'
                   }}
                 >
-                  Department
+                  Department <span className="optional-tag">(optional)</span>
                 </label>
 
                 <div className="input-group">
@@ -375,7 +494,7 @@ function BatchManagement() {
                     fontWeight: '500'
                   }}
                 >
-                  Academic Year
+                  Academic Year <span className="optional-tag">(optional)</span>
                 </label>
 
                 <div className="input-group">
@@ -420,16 +539,7 @@ function BatchManagement() {
                     fontWeight: '500'
                   }}
                 >
-                  Description
-                  <span
-                    className="ms-1"
-                    style={{
-                      color: '#A1A1AA',
-                      fontWeight: '400'
-                    }}
-                  >
-                    Optional
-                  </span>
+                  Description <span className="optional-tag">(optional)</span>
                 </label>
 
                 <textarea
@@ -451,29 +561,51 @@ function BatchManagement() {
 
             </div>
 
-            {/* Create Button */}
-            <div className="d-flex justify-content-end mt-3">
+            {/* Form Action Buttons */}
+            <div className="d-flex justify-content-end align-items-center gap-2 mt-3">
+
+              {editingBatchId && (
+                <button
+                  type="button"
+                  onClick={handleCancelEdit}
+                  className="btn"
+                  disabled={submitting}
+                  style={{
+                    background: '#FAFAFA',
+                    border: '1px solid #E4E4E7',
+                    borderRadius: '9px',
+                    color: '#71717A',
+                    fontSize: '13px',
+                    fontWeight: '500',
+                    padding: '8px 15px',
+                    cursor: 'pointer'
+                  }}
+                >
+                  Cancel
+                </button>
+              )}
 
               <button
                 type="submit"
                 className="btn d-flex align-items-center justify-content-center gap-2"
-                disabled={creating}
+                disabled={submitting}
                 style={{
-                  background: creating
+                  background: submitting
                     ? '#E4E4E7'
                     : '#7C3AED',
-                  color: creating
+                  color: submitting
                     ? '#71717A'
                     : '#FFFFFF',
                   border: '1px solid transparent',
                   borderRadius: '9px',
                   padding: '8px 15px',
                   fontSize: '13px',
-                  fontWeight: '500'
+                  fontWeight: '500',
+                  cursor: submitting ? 'not-allowed' : 'pointer'
                 }}
               >
 
-                {creating ? (
+                {submitting ? (
                   <>
                     <span
                       className="spinner-border spinner-border-sm"
@@ -483,12 +615,12 @@ function BatchManagement() {
                       }}
                     />
 
-                    Creating...
+                    {editingBatchId ? 'Updating...' : 'Creating...'}
                   </>
                 ) : (
                   <>
-                    <i className="bi bi-plus-lg" />
-                    Create Batch
+                    <i className={editingBatchId ? 'bi bi-check-lg' : 'bi bi-plus-lg'} />
+                    {editingBatchId ? 'Update Batch' : 'Create Batch'}
                   </>
                 )}
 
@@ -636,46 +768,93 @@ function BatchManagement() {
 
                 <div className="card-body p-3">
 
-                  {/* Batch Title */}
-                  <div className="d-flex align-items-start gap-3 mb-3">
+                  {/* Batch Title & Actions */}
+                  <div className="d-flex align-items-start justify-content-between gap-2 mb-3">
 
-                    <div
-                      className="d-flex align-items-center justify-content-center flex-shrink-0"
-                      style={{
-                        width: '40px',
-                        height: '40px',
-                        borderRadius: '10px',
-                        background: '#F5F3FF',
-                        color: '#7C3AED'
-                      }}
-                    >
-                      <i className="bi bi-mortarboard" />
-                    </div>
-
-                    <div
-                      style={{
-                        minWidth: 0
-                      }}
-                    >
-
-                      <h6
-                        className="fw-semibold mb-1 text-truncate"
-                        style={{
-                          color: '#18181B'
-                        }}
-                      >
-                        {batch.name}
-                      </h6>
-
+                    <div className="d-flex align-items-start gap-3 min-w-0">
                       <div
+                        className="d-flex align-items-center justify-content-center flex-shrink-0"
                         style={{
-                          color: '#A1A1AA',
-                          fontSize: '11px'
+                          width: '40px',
+                          height: '40px',
+                          borderRadius: '10px',
+                          background: editingBatchId === batch._id ? '#7C3AED' : '#F5F3FF',
+                          color: editingBatchId === batch._id ? '#FFFFFF' : '#7C3AED',
+                          transition: 'all 0.2s ease'
                         }}
                       >
-                        Learning Space
+                        <i className="bi bi-mortarboard" />
                       </div>
 
+                      <div style={{ minWidth: 0 }}>
+                        <h6
+                          className="fw-semibold mb-1 text-truncate"
+                          style={{
+                            color: '#18181B'
+                          }}
+                        >
+                          {batch.name}
+                        </h6>
+
+                        <div
+                          style={{
+                            color: '#A1A1AA',
+                            fontSize: '11px'
+                          }}
+                        >
+                          Learning Space
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="d-flex align-items-center gap-1 flex-shrink-0">
+                      <button
+                        type="button"
+                        onClick={() => handleEditClick(batch)}
+                        className="btn btn-sm d-inline-flex align-items-center gap-1"
+                        title="Edit this batch"
+                        style={{
+                          background: editingBatchId === batch._id ? '#EDE9FE' : '#F4F4F5',
+                          color: editingBatchId === batch._id ? '#6D28D9' : '#52525B',
+                          border: editingBatchId === batch._id ? '1px solid #C4B5FD' : '1px solid #E4E4E7',
+                          borderRadius: '8px',
+                          fontSize: '12px',
+                          fontWeight: '500',
+                          padding: '4px 10px',
+                          cursor: 'pointer',
+                          transition: 'all 0.15s ease'
+                        }}
+                      >
+                        <i className="bi bi-pencil-square" style={{ fontSize: '12px' }} />
+                        <span>{editingBatchId === batch._id ? 'Editing' : 'Edit'}</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteBatch(batch)}
+                        disabled={deletingId === batch._id}
+                        className="btn btn-sm d-inline-flex align-items-center justify-content-center text-danger"
+                        title="Delete this batch (only empty batches)"
+                        style={{
+                          background: '#FEF2F2',
+                          border: '1px solid #FECACA',
+                          borderRadius: '8px',
+                          width: '28px',
+                          height: '28px',
+                          padding: 0,
+                          cursor: deletingId === batch._id ? 'not-allowed' : 'pointer',
+                          transition: 'all 0.15s ease'
+                        }}
+                      >
+                        {deletingId === batch._id ? (
+                          <span
+                            className="spinner-border spinner-border-sm"
+                            style={{ width: '11px', height: '11px' }}
+                          />
+                        ) : (
+                          <i className="bi bi-trash3" style={{ fontSize: '12px' }} />
+                        )}
+                      </button>
                     </div>
 
                   </div>
@@ -734,7 +913,7 @@ function BatchManagement() {
                   {/* Description */}
                   {batch.description ? (
                     <p
-                      className="small mb-0"
+                      className="small mb-3"
                       style={{
                         color: '#71717A',
                         lineHeight: '1.6'
@@ -744,7 +923,7 @@ function BatchManagement() {
                     </p>
                   ) : (
                     <p
-                      className="small mb-0"
+                      className="small mb-3"
                       style={{
                         color: '#A1A1AA',
                         fontStyle: 'italic'
@@ -753,6 +932,28 @@ function BatchManagement() {
                       No description added.
                     </p>
                   )}
+
+                  {/* Open Batch Space Link Button */}
+                  <div className="pt-2 border-top">
+                    <Link
+                      to={`/institute/batches/${batch._id}`}
+                      className="btn btn-sm w-100 d-flex align-items-center justify-content-center gap-2"
+                      style={{
+                        background: '#F5F3FF',
+                        border: '1px solid #DDD6FE',
+                        borderRadius: '9px',
+                        color: '#7C3AED',
+                        fontSize: '12px',
+                        fontWeight: '600',
+                        padding: '7px 12px',
+                        textDecoration: 'none',
+                        transition: 'all 0.15s ease'
+                      }}
+                    >
+                      <i className="bi bi-box-arrow-up-right" style={{ fontSize: '11px' }}></i>
+                      <span>View Batch Space & Content</span>
+                    </Link>
+                  </div>
 
                 </div>
 

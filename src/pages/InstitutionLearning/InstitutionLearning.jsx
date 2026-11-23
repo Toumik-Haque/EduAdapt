@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 
 import SpaceSwitcher from '../../components/SpaceSwitcher/SpaceSwitcher'
+import StudyMaterials from '../../components/StudyMaterials/StudyMaterials'
 import { useAuth } from '../../context/AuthContext'
 
 function InstitutionLearning() {
@@ -542,6 +543,12 @@ function InstitutionLearning() {
                                     }
                                   </p>
                                 )}
+
+                                <StudyMaterials
+                                  subjectId={subject._id}
+                                  batchId={selectedBatch?.batchId}
+                                  isTeacher={false}
+                                />
 
                               </div>
 

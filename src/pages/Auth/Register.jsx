@@ -15,6 +15,8 @@ function Register() {
 
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
   // Institute-specific field
   const [instituteType, setInstituteType] = useState('')
@@ -634,7 +636,7 @@ function Register() {
                                   fontWeight: '600'
                                 }}
                               >
-                                Institute Name
+                                Institute Name <span className="required-star">*</span>
                               </label>
 
                               <div className="input-group">
@@ -679,7 +681,7 @@ function Register() {
                                   fontWeight: '600'
                                 }}
                               >
-                                Institute Type
+                                Institute Type <span className="required-star">*</span>
                               </label>
 
                               <select
@@ -738,7 +740,7 @@ function Register() {
                                 fontWeight: '600'
                               }}
                             >
-                              Full Name
+                              Full Name <span className="required-star">*</span>
                             </label>
 
                             <div className="input-group">
@@ -789,7 +791,7 @@ function Register() {
                           >
                             {accountType === 'institute'
                               ? 'Official Email Address'
-                              : 'Email Address'}
+                              : 'Email Address'} <span className="required-star">*</span>
                           </label>
 
                           <div className="d-flex gap-2">
@@ -898,7 +900,7 @@ function Register() {
                                 fontWeight: '600'
                               }}
                             >
-                              Email Verification Code
+                              Email Verification Code <span className="required-star">*</span>
                             </label>
 
                             <input
@@ -981,7 +983,7 @@ function Register() {
                               fontWeight: '600'
                             }}
                           >
-                            Password
+                            Password <span className="required-star">*</span>
                           </label>
 
                           <div className="input-group">
@@ -998,7 +1000,7 @@ function Register() {
                             </span>
 
                             <input
-                              type="password"
+                              type={showPassword ? 'text' : 'password'}
                               className="form-control"
                               placeholder="Minimum 6 characters"
                               value={password}
@@ -1011,6 +1013,16 @@ function Register() {
                                 padding: '10px 12px'
                               }}
                             />
+
+                            <button
+                              type="button"
+                              onClick={() => setShowPassword(!showPassword)}
+                              className="input-group-text bg-white"
+                              style={{ borderColor: '#E4E4E7', cursor: 'pointer' }}
+                              title={showPassword ? 'Hide password' : 'Show password'}
+                            >
+                              <i className={`bi ${showPassword ? 'bi-eye-slash-fill' : 'bi-eye-fill'} text-secondary`} />
+                            </button>
 
                           </div>
 
@@ -1029,7 +1041,7 @@ function Register() {
                               fontWeight: '600'
                             }}
                           >
-                            Confirm Password
+                            Confirm Password <span className="required-star">*</span>
                           </label>
 
                           <div className="input-group">
@@ -1046,7 +1058,7 @@ function Register() {
                             </span>
 
                             <input
-                              type="password"
+                              type={showConfirmPassword ? 'text' : 'password'}
                               className="form-control"
                               placeholder="Re-enter your password"
                               value={confirmPassword}
@@ -1059,6 +1071,16 @@ function Register() {
                                 padding: '10px 12px'
                               }}
                             />
+
+                            <button
+                              type="button"
+                              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                              className="input-group-text bg-white"
+                              style={{ borderColor: '#E4E4E7', cursor: 'pointer' }}
+                              title={showConfirmPassword ? 'Hide password' : 'Show password'}
+                            >
+                              <i className={`bi ${showConfirmPassword ? 'bi-eye-slash-fill' : 'bi-eye-fill'} text-secondary`} />
+                            </button>
 
                           </div>
 

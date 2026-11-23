@@ -1,11 +1,25 @@
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
+import { useModal } from '../../context/ModalContext'
+import ImageCropModal from '../../components/ImageCropModal/ImageCropModal'
 
 function InstituteProfileEdit() {
-  const { token, user } = useAuth()
+  const navigate = useNavigate()
+  const { token, user, logout, updateUser, updateProfile } = useAuth()
+  const { showConfirm, showAlert } = useModal()
+
+  const [deleting, setDeleting] = useState(false)
+
+  // Cropper Modal State (covers both cover and logo with appropriate aspect ratio)
+  const [cropImageSrc, setCropImageSrc] = useState(null)
+  const [cropTarget, setCropTarget] = useState('cover') // 'cover' | 'logo'
+  const [showCropModal, setShowCropModal] = useState(false)
+  const [croppedCoverPreview, setCroppedCoverPreview] = useState(null)
+  const [croppedLogoPreview, setCroppedLogoPreview] = useState(null)
 
   const [form, setForm] = useState({
+    username: user?.username || '',
     instituteName: '',
     instituteType: 'college',
     about: '',
@@ -33,6 +47,7 @@ function InstituteProfileEdit() {
 
   const [profilePhotoFile, setProfilePhotoFile] = useState(null)
   const [uploadingProfilePhoto, setUploadingProfilePhoto] = useState(false)
+  const [removingProfilePhoto, setRemovingProfilePhoto] = useState(false)
 
   const [coverPhoto, setCoverPhoto] = useState({
     url: '',
@@ -41,6 +56,7 @@ function InstituteProfileEdit() {
 
   const [coverPhotoFile, setCoverPhotoFile] = useState(null)
   const [uploadingCoverPhoto, setUploadingCoverPhoto] = useState(false)
+  const [removingCoverPhoto, setRemovingCoverPhoto] = useState(false)
 
   /*
     ============================
@@ -72,6 +88,7 @@ function InstituteProfileEdit() {
         }
 
         setForm({
+          username: user?.username || '',
           instituteName: data.profile.instituteName || '',
           instituteType:
             data.profile.instituteType || 'college',
@@ -172,6 +189,10 @@ function InstituteProfileEdit() {
         )
       }
 
+      if (data.username) {
+        updateUser({ username: data.username })
+      }
+
       setMessage('Profile updated successfully')
 
       window.scrollTo({
@@ -192,12 +213,103 @@ function InstituteProfileEdit() {
 
   /*
     ============================
-    PROFILE PHOTO UPLOAD
+    REMOVE LOGO & COVER BANNER
   ============================
   */
 
-  const handleProfilePhotoUpload = async () => {
-    if (!profilePhotoFile) return
+  const handleRemoveProfilePhoto = async () => {
+    const confirmed = await showConfirm(
+      'Are you sure you want to remove your institute logo? It will be replaced with the default emblem.',
+      'Remove Logo',
+      'warning',
+      'Yes, Remove',
+      'Cancel'
+    )
+
+    if (!confirmed) return
+
+    try {
+      setRemovingProfilePhoto(true)
+      setError('')
+      setMessage('')
+
+      const res = await fetch('http://localhost:5000/api/membership/institute/profile/photo', {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
+
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.message || 'Failed to remove logo')
+
+      setProfilePhoto({ url: '', publicId: '' })
+      setCroppedLogoPreview(null)
+      updateProfile({ profilePhoto: { url: '', publicId: '' } })
+      setMessage('Institute logo removed successfully.')
+    } catch (err) {
+      console.error(err)
+      setError(err.message)
+    } finally {
+      setRemovingProfilePhoto(false)
+    }
+  }
+
+  const handleRemoveCoverPhoto = async () => {
+    const confirmed = await showConfirm(
+      'Are you sure you want to remove your campus cover banner?',
+      'Remove Cover Banner',
+      'warning',
+      'Yes, Remove',
+      'Cancel'
+    )
+
+    if (!confirmed) return
+
+    try {
+      setRemovingCoverPhoto(true)
+      setError('')
+      setMessage('')
+
+      const res = await fetch('http://localhost:5000/api/membership/institute/profile/cover', {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
+
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.message || 'Failed to remove cover banner')
+
+      setCoverPhoto({ url: '', publicId: '' })
+      setCroppedCoverPreview(null)
+      updateProfile({ coverPhoto: { url: '', publicId: '' } })
+      setMessage('Campus cover banner removed successfully.')
+    } catch (err) {
+      console.error(err)
+      setError(err.message)
+    } finally {
+      setRemovingCoverPhoto(false)
+    }
+  }
+
+  const handleLogoFileSelect = (e) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    const reader = new FileReader()
+    reader.onload = () => {
+      setCropImageSrc(reader.result)
+      setCropTarget('logo')
+      setShowCropModal(true)
+    }
+    reader.readAsDataURL(file)
+    e.target.value = ''
+  }
+
+  const handleLogoCropComplete = async (croppedFile, previewUrl) => {
+    setShowCropModal(false)
+    setCroppedLogoPreview(previewUrl)
 
     try {
       setUploadingProfilePhoto(true)
@@ -205,11 +317,7 @@ function InstituteProfileEdit() {
       setMessage('')
 
       const formData = new FormData()
-
-      formData.append(
-        'profilePhoto',
-        profilePhotoFile
-      )
+      formData.append('profilePhoto', croppedFile)
 
       const response = await fetch(
         'http://localhost:5000/api/membership/institute/profile/photo',
@@ -226,23 +334,17 @@ function InstituteProfileEdit() {
 
       if (!response.ok) {
         throw new Error(
-          data.message ||
-          'Failed to upload profile photo'
+          data.message || 'Failed to upload profile photo'
         )
       }
 
       setProfilePhoto(data.profilePhoto)
       setProfilePhotoFile(null)
-
-      setMessage(
-        'Profile photo uploaded successfully'
-      )
+      setCroppedLogoPreview(null)
+      updateProfile({ profilePhoto: data.profilePhoto })
+      setMessage('Institute logo uploaded successfully!')
     } catch (error) {
-      console.error(
-        'Profile photo upload error:',
-        error
-      )
-
+      console.error('Profile photo upload error:', error)
       setError(error.message)
     } finally {
       setUploadingProfilePhoto(false)
@@ -251,12 +353,27 @@ function InstituteProfileEdit() {
 
   /*
     ============================
-    COVER PHOTO UPLOAD
+    COVER PHOTO CROP & AUTO-UPLOAD (16:9 Ratio)
   ============================
   */
 
-  const handleCoverPhotoUpload = async () => {
-    if (!coverPhotoFile) return
+  const handleCoverFileSelect = (e) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    const reader = new FileReader()
+    reader.onload = () => {
+      setCropImageSrc(reader.result)
+      setCropTarget('cover')
+      setShowCropModal(true)
+    }
+    reader.readAsDataURL(file)
+    e.target.value = ''
+  }
+
+  const handleCoverCropComplete = async (croppedFile, previewUrl) => {
+    setShowCropModal(false)
+    setCroppedCoverPreview(previewUrl)
 
     try {
       setUploadingCoverPhoto(true)
@@ -264,11 +381,7 @@ function InstituteProfileEdit() {
       setMessage('')
 
       const formData = new FormData()
-
-      formData.append(
-        'coverPhoto',
-        coverPhotoFile
-      )
+      formData.append('coverPhoto', croppedFile)
 
       const response = await fetch(
         'http://localhost:5000/api/membership/institute/profile/cover',
@@ -285,23 +398,17 @@ function InstituteProfileEdit() {
 
       if (!response.ok) {
         throw new Error(
-          data.message ||
-          'Failed to upload cover photo'
+          data.message || 'Failed to upload cover photo'
         )
       }
 
       setCoverPhoto(data.coverPhoto)
       setCoverPhotoFile(null)
-
-      setMessage(
-        'Cover photo uploaded successfully'
-      )
+      setCroppedCoverPreview(null)
+      updateProfile({ coverPhoto: data.coverPhoto })
+      setMessage('Campus cover banner uploaded successfully!')
     } catch (error) {
-      console.error(
-        'Cover photo upload error:',
-        error
-      )
-
+      console.error('Cover photo upload error:', error)
       setError(error.message)
     } finally {
       setUploadingCoverPhoto(false)
@@ -484,9 +591,9 @@ function InstituteProfileEdit() {
 
           .edu-media-layout {
             display: grid;
-            grid-template-columns: 330px minmax(0, 1fr);
-            gap: 14px;
-            margin-bottom: 14px;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 16px;
+            margin-bottom: 16px;
           }
 
           .edu-panel {
@@ -1011,7 +1118,7 @@ function InstituteProfileEdit() {
             </div>
 
             <Link
-              to={`/institutions/${user._id}`}
+              to={`/institute/${user.username || user._id}`}
               className="edu-preview-link"
             >
               <i className="bi bi-eye" />
@@ -1055,161 +1162,198 @@ function InstituteProfileEdit() {
 
           <div className="edu-media-layout">
 
-            {/* PROFILE PHOTO */}
+            {/* PROFILE PHOTO / LOGO */}
 
-            <div className="edu-panel edu-panel-padding">
+            <div className="edu-panel edu-panel-padding d-flex flex-column justify-content-between">
 
-              <div className="edu-panel-header">
-
-                <h2 className="edu-panel-title">
-                  Profile photo
-                </h2>
-
-                <p className="edu-panel-description">
-                  Your institution's identity image.
-                </p>
-
-              </div>
-
-              <div className="edu-avatar-upload">
-
-                <div className="edu-avatar-preview">
-
-                  {profilePhoto.url ? (
-                    <img
-                      src={profilePhoto.url}
-                      alt="Institute profile"
-                    />
-                  ) : (
-                    <i className="bi bi-building" />
-                  )}
-
+              <div>
+                <div className="d-flex align-items-center justify-content-between mb-3">
+                  <div>
+                    <h2 className="edu-panel-title mb-1">
+                      Institute Logo
+                    </h2>
+                    <p className="edu-panel-description">
+                      Square emblem displayed across rosters & headers.
+                    </p>
+                  </div>
+                  <span className="badge-meta badge-meta-purple">1:1 Ratio</span>
                 </div>
 
-                <div className="edu-upload-controls">
-
-                  <input
-                    type="file"
-                    className="edu-file-input"
-                    accept="image/*"
-                    onChange={(e) =>
-                      setProfilePhotoFile(
-                        e.target.files[0] || null
-                      )
-                    }
-                  />
-
-                  <button
-                    type="button"
-                    className="edu-upload-button"
-                    onClick={
-                      handleProfilePhotoUpload
-                    }
-                    disabled={
-                      !profilePhotoFile ||
-                      uploadingProfilePhoto
-                    }
+                <div className="d-flex align-items-center gap-3 p-3 rounded-4 mb-2" style={{ background: '#F8FAFC', border: '1px dashed #CBD5E1' }}>
+                  <div
+                    className="position-relative flex-shrink-0 rounded-4 overflow-hidden shadow-sm"
+                    style={{
+                      width: '92px',
+                      height: '92px',
+                      background: 'linear-gradient(135deg, #EEF2FF 0%, #E0E7FF 100%)',
+                      border: '2px solid #FFFFFF'
+                    }}
                   >
                     {uploadingProfilePhoto ? (
-                      <>
-                        <span
-                          className="spinner-border spinner-border-sm me-2"
-                          role="status"
-                        />
-                        Uploading
-                      </>
+                      <div className="w-100 h-100 d-flex flex-column align-items-center justify-content-center bg-white bg-opacity-75">
+                        <span className="spinner-border spinner-border-sm text-primary mb-1" role="status" />
+                        <span style={{ fontSize: '10px' }} className="text-primary fw-semibold">Saving...</span>
+                      </div>
+                    ) : (croppedLogoPreview || profilePhoto.url) ? (
+                      <img
+                        src={croppedLogoPreview || profilePhoto.url}
+                        alt="Institute logo"
+                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                      />
                     ) : (
-                      <>
-                        <i className="bi bi-upload me-1" />
-                        Upload photo
-                      </>
+                      <div className="w-100 h-100 d-flex flex-column align-items-center justify-content-center text-primary">
+                        <i className="bi bi-building fs-3" />
+                      </div>
                     )}
-                  </button>
+                  </div>
 
+                  <div className="flex-grow-1 min-w-0">
+                    <div className="d-flex align-items-center gap-2 flex-wrap mb-1">
+                      <label
+                        htmlFor="logo-file-input"
+                        className="btn btn-sm btn-primary rounded-pill px-3 py-2 d-inline-flex align-items-center gap-2 shadow-xs text-white"
+                        style={{ fontSize: '12px', fontWeight: 600, cursor: (uploadingProfilePhoto || removingProfilePhoto) ? 'not-allowed' : 'pointer' }}
+                      >
+                        {uploadingProfilePhoto ? (
+                          <>
+                            <span className="spinner-border spinner-border-sm" role="status" />
+                            <span>Uploading...</span>
+                          </>
+                        ) : (
+                          <>
+                            <i className="bi bi-camera" />
+                            <span>{(croppedLogoPreview || profilePhoto.url) ? 'Change Logo' : 'Select Logo'}</span>
+                          </>
+                        )}
+                      </label>
+
+                      {profilePhoto.url && (
+                        <button
+                          type="button"
+                          onClick={handleRemoveProfilePhoto}
+                          disabled={removingProfilePhoto || uploadingProfilePhoto}
+                          className="btn btn-sm btn-outline-danger rounded-pill px-3 py-2 d-inline-flex align-items-center gap-1 shadow-xs"
+                          style={{ fontSize: '12px', fontWeight: 600 }}
+                        >
+                          {removingProfilePhoto ? (
+                            <span className="spinner-border spinner-border-sm" role="status" />
+                          ) : (
+                            <i className="bi bi-trash3" />
+                          )}
+                          <span>Remove</span>
+                        </button>
+                      )}
+                    </div>
+                    <input
+                      id="logo-file-input"
+                      type="file"
+                      className="d-none"
+                      accept="image/*"
+                      disabled={uploadingProfilePhoto || removingProfilePhoto}
+                      onChange={handleLogoFileSelect}
+                    />
+                    <div className="text-secondary text-truncate mt-1" style={{ fontSize: '11px' }}>
+                      Fixed 1:1 square ratio with instant upload.
+                    </div>
+                  </div>
                 </div>
-
               </div>
 
             </div>
 
             {/* COVER PHOTO */}
 
-            <div className="edu-panel edu-panel-padding">
+            <div className="edu-panel edu-panel-padding d-flex flex-column justify-content-between">
 
-              <div className="edu-panel-header">
-
-                <h2 className="edu-panel-title">
-                  Cover photo
-                </h2>
-
-                <p className="edu-panel-description">
-                  This image appears at the top of your public
-                  profile.
-                </p>
-
-              </div>
-
-              <div className="edu-cover-preview">
-
-                {coverPhoto.url ? (
-                  <img
-                    src={coverPhoto.url}
-                    alt="Institute cover"
-                  />
-                ) : (
-                  <div className="edu-cover-placeholder">
-
-                    <i className="bi bi-image" />
-
-                    <span>
-                      No cover photo added
-                    </span>
-
+              <div>
+                <div className="d-flex align-items-center justify-content-between mb-3">
+                  <div>
+                    <h2 className="edu-panel-title mb-1">
+                      Campus Cover Banner
+                    </h2>
+                    <p className="edu-panel-description">
+                      Prominent header banner showcased on your public page.
+                    </p>
                   </div>
-                )}
+                  <span className="badge-meta badge-meta-emerald">16:9 Banner</span>
+                </div>
 
-              </div>
-
-              <div className="edu-cover-controls">
-
-                <input
-                  type="file"
-                  className="edu-file-input"
-                  accept="image/*"
-                  onChange={(e) =>
-                    setCoverPhotoFile(
-                      e.target.files[0] || null
-                    )
-                  }
-                />
-
-                <button
-                  type="button"
-                  className="edu-upload-button mt-0"
-                  onClick={
-                    handleCoverPhotoUpload
-                  }
-                  disabled={
-                    !coverPhotoFile ||
-                    uploadingCoverPhoto
-                  }
+                <div
+                  className="position-relative rounded-4 overflow-hidden mb-2 shadow-xs"
+                  style={{
+                    height: '110px',
+                    background: (croppedCoverPreview || coverPhoto.url)
+                      ? '#000'
+                      : 'linear-gradient(135deg, #4F46E5 0%, #7C3AED 50%, #C084FC 100%)',
+                    border: '1px solid #E2E8F0'
+                  }}
                 >
                   {uploadingCoverPhoto ? (
-                    <>
-                      <span
-                        className="spinner-border spinner-border-sm me-1"
-                        role="status"
-                      />
-                      Uploading
-                    </>
+                    <div className="w-100 h-100 d-flex flex-column align-items-center justify-content-center text-white" style={{ background: 'rgba(15, 23, 42, 0.7)' }}>
+                      <span className="spinner-border text-white mb-2" role="status" />
+                      <span style={{ fontSize: '12px', fontWeight: 600 }}>Saving Banner...</span>
+                    </div>
+                  ) : (croppedCoverPreview || coverPhoto.url) ? (
+                    <img
+                      src={croppedCoverPreview || coverPhoto.url}
+                      alt="Institute cover"
+                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                    />
                   ) : (
-                    <>
-                      <i className="bi bi-upload me-1" />
-                      Upload
-                    </>
+                    <div className="w-100 h-100 d-flex flex-column align-items-center justify-content-center text-white">
+                      <i className="bi bi-image fs-3 mb-1 opacity-75" />
+                      <span style={{ fontSize: '11px', opacity: 0.9 }}>No cover banner uploaded</span>
+                    </div>
                   )}
-                </button>
 
+                  <div className="position-absolute bottom-0 end-0 m-2 d-flex align-items-center gap-1">
+                    {coverPhoto.url && (
+                      <button
+                        type="button"
+                        onClick={handleRemoveCoverPhoto}
+                        disabled={removingCoverPhoto || uploadingCoverPhoto}
+                        className="btn btn-sm btn-danger bg-opacity-80 rounded-pill px-3 py-1 d-inline-flex align-items-center gap-1 text-white border-0 shadow-sm"
+                        style={{
+                          fontSize: '11px',
+                          cursor: (uploadingCoverPhoto || removingCoverPhoto) ? 'not-allowed' : 'pointer',
+                          backdropFilter: 'blur(4px)'
+                        }}
+                      >
+                        {removingCoverPhoto ? (
+                          <span className="spinner-border spinner-border-sm" role="status" />
+                        ) : (
+                          <i className="bi bi-trash3" />
+                        )}
+                        <span>Remove</span>
+                      </button>
+                    )}
+
+                    <label
+                      htmlFor="cover-file-input"
+                      className="btn btn-sm btn-dark bg-opacity-75 rounded-pill px-3 py-1 d-inline-flex align-items-center gap-1 text-white border-0 shadow-sm mb-0"
+                      style={{
+                        fontSize: '11px',
+                        cursor: (uploadingCoverPhoto || removingCoverPhoto) ? 'not-allowed' : 'pointer',
+                        backdropFilter: 'blur(4px)'
+                      }}
+                    >
+                      <i className="bi bi-camera" />
+                      <span>{coverPhoto.url ? 'Change Banner' : 'Select Banner'}</span>
+                    </label>
+                  </div>
+                  <input
+                    id="cover-file-input"
+                    type="file"
+                    className="d-none"
+                    accept="image/*"
+                    disabled={uploadingCoverPhoto || removingCoverPhoto}
+                    onChange={handleCoverFileSelect}
+                  />
+                </div>
+
+                <div className="text-secondary text-truncate" style={{ fontSize: '11px' }}>
+                  Selecting and confirming will upload your banner instantly.
+                </div>
               </div>
 
             </div>
@@ -1245,10 +1389,54 @@ function InstituteProfileEdit() {
 
               <div className="row g-3">
 
+                <div className="col-12">
+
+                  <label className="edu-label">
+                    Username <span className="required-star">*</span>
+                  </label>
+
+                  <div className="input-group">
+                    <span
+                      className="input-group-text fw-semibold"
+                      style={{
+                        borderRadius: '9px 0 0 9px',
+                        background: '#F4F4F5',
+                        border: '1px solid var(--edu-border)',
+                        borderRight: 'none',
+                        color: '#71717A',
+                        padding: '8px 14px',
+                        fontSize: '13px'
+                      }}
+                    >
+                      @
+                    </span>
+                    <input
+                      type="text"
+                      name="username"
+                      className="form-control"
+                      value={form.username}
+                      onChange={handleChange}
+                      placeholder="instituteusername"
+                      required
+                      style={{
+                        borderRadius: '0 9px 9px 0',
+                        border: '1px solid var(--edu-border)',
+                        padding: '8px 12px',
+                        fontSize: '12px',
+                        color: 'var(--edu-text)'
+                      }}
+                    />
+                  </div>
+                  <small className="text-secondary mt-1 d-block" style={{ fontSize: '11px' }}>
+                    Your unique handle across the EduAdapt ecosystem.
+                  </small>
+
+                </div>
+
                 <div className="col-md-8">
 
                   <label className="edu-label">
-                    Institute name
+                    Institute name <span className="required-star">*</span>
                   </label>
 
                   <input
@@ -1266,7 +1454,7 @@ function InstituteProfileEdit() {
                 <div className="col-md-4">
 
                   <label className="edu-label">
-                    Institute type
+                    Institute type <span className="required-star">*</span>
                   </label>
 
                   <select
@@ -1301,7 +1489,7 @@ function InstituteProfileEdit() {
                 <div className="col-12">
 
                   <label className="edu-label">
-                    About your institute
+                    About your institute <span className="optional-tag">(optional)</span>
                   </label>
 
                   <textarea
@@ -1346,7 +1534,7 @@ function InstituteProfileEdit() {
                 <div className="col-md-6">
 
                   <label className="edu-label">
-                    Phone
+                    Phone <span className="required-star">*</span>
                   </label>
 
                   <div className="edu-input-group">
@@ -1360,6 +1548,7 @@ function InstituteProfileEdit() {
                       value={form.phone}
                       onChange={handleChange}
                       placeholder="Institute contact number"
+                      required
                     />
 
                   </div>
@@ -1369,7 +1558,7 @@ function InstituteProfileEdit() {
                 <div className="col-md-6">
 
                   <label className="edu-label">
-                    Website
+                    Website <span className="optional-tag">(optional)</span>
                   </label>
 
                   <div className="edu-input-group">
@@ -1420,7 +1609,7 @@ function InstituteProfileEdit() {
                 <div className="col-12">
 
                   <label className="edu-label">
-                    Address
+                    Address <span className="required-star">*</span>
                   </label>
 
                   <div className="edu-input-group">
@@ -1434,6 +1623,7 @@ function InstituteProfileEdit() {
                       value={form.address}
                       onChange={handleChange}
                       placeholder="Street address"
+                      required
                     />
 
                   </div>
@@ -1443,7 +1633,7 @@ function InstituteProfileEdit() {
                 <div className="col-md-4">
 
                   <label className="edu-label">
-                    City
+                    City <span className="required-star">*</span>
                   </label>
 
                   <input
@@ -1453,6 +1643,7 @@ function InstituteProfileEdit() {
                     value={form.city}
                     onChange={handleChange}
                     placeholder="City"
+                    required
                   />
 
                 </div>
@@ -1460,7 +1651,7 @@ function InstituteProfileEdit() {
                 <div className="col-md-4">
 
                   <label className="edu-label">
-                    State
+                    State <span className="required-star">*</span>
                   </label>
 
                   <input
@@ -1470,6 +1661,7 @@ function InstituteProfileEdit() {
                     value={form.state}
                     onChange={handleChange}
                     placeholder="State"
+                    required
                   />
 
                 </div>
@@ -1477,7 +1669,7 @@ function InstituteProfileEdit() {
                 <div className="col-md-4">
 
                   <label className="edu-label">
-                    Country
+                    Country <span className="required-star">*</span>
                   </label>
 
                   <input
@@ -1487,6 +1679,7 @@ function InstituteProfileEdit() {
                     value={form.country}
                     onChange={handleChange}
                     placeholder="Country"
+                    required
                   />
 
                 </div>
@@ -1523,7 +1716,7 @@ function InstituteProfileEdit() {
                 <div className="col-md-6">
 
                   <label className="edu-label">
-                    Facebook
+                    Facebook <span className="optional-tag">(optional)</span>
                   </label>
 
                   <div className="edu-social-input">
@@ -1546,7 +1739,7 @@ function InstituteProfileEdit() {
                 <div className="col-md-6">
 
                   <label className="edu-label">
-                    Instagram
+                    Instagram <span className="optional-tag">(optional)</span>
                   </label>
 
                   <div className="edu-social-input">
@@ -1569,7 +1762,7 @@ function InstituteProfileEdit() {
                 <div className="col-md-6">
 
                   <label className="edu-label">
-                    LinkedIn
+                    LinkedIn <span className="optional-tag">(optional)</span>
                   </label>
 
                   <div className="edu-social-input">
@@ -1592,7 +1785,7 @@ function InstituteProfileEdit() {
                 <div className="col-md-6">
 
                   <label className="edu-label">
-                    YouTube
+                    YouTube <span className="optional-tag">(optional)</span>
                   </label>
 
                   <div className="edu-social-input">
@@ -1655,7 +1848,88 @@ function InstituteProfileEdit() {
 
           </form>
 
+          {/* Danger Zone: Delete Institute Account */}
+          <div
+            className="mt-5 p-4"
+            style={{
+              borderRadius: '16px',
+              border: '1px solid #FCA5A5',
+              background: '#FEF2F2'
+            }}
+          >
+            <div className="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-3">
+              <div>
+                <h6 className="fw-bold mb-1" style={{ color: '#991B1B' }}>
+                  <i className="bi bi-exclamation-triangle-fill me-2" />
+                  Danger Zone
+                </h6>
+                <p className="mb-0 text-secondary" style={{ fontSize: '0.875rem' }}>
+                  Permanently delete your institute account (@{user?.username || 'institute'}), remove public profile, and wipe all institute data.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={async () => {
+                  const confirmed = await showConfirm(
+                    'Are you sure you want to permanently delete your EduAdapt institute account? This will erase your institute profile and associated data. This action cannot be reversed.',
+                    'Delete Institute Account',
+                    'danger',
+                    'Yes, Delete Account',
+                    'Cancel'
+                  )
+
+                  if (!confirmed) return
+
+                  try {
+                    setDeleting(true)
+                    const res = await fetch('http://localhost:5000/api/auth/delete-account', {
+                      method: 'DELETE',
+                      headers: {
+                        Authorization: `Bearer ${token}`
+                      }
+                    })
+                    const data = await res.json()
+
+                    if (!res.ok) {
+                      throw new Error(data.message || 'Failed to delete account')
+                    }
+
+                    await showAlert('Your institute account has been deleted permanently.', 'Account Deleted', 'success')
+                    logout()
+                    navigate('/login')
+                  } catch (err) {
+                    console.error(err)
+                    showAlert(err.message || 'Error deleting account', 'Error', 'danger')
+                  } finally {
+                    setDeleting(false)
+                  }
+                }}
+                disabled={deleting}
+                className="btn btn-danger fw-semibold px-3 py-2 text-nowrap"
+                style={{
+                  borderRadius: '10px',
+                  background: '#DC2626',
+                  border: 'none',
+                  fontSize: '0.875rem'
+                }}
+              >
+                {deleting ? 'Deleting...' : 'Delete Institute Account'}
+              </button>
+            </div>
+          </div>
+
         </div>
+
+        {/* Fixed Ratio Cover / Logo Image Cropper Modal */}
+        {showCropModal && cropImageSrc && (
+          <ImageCropModal
+            imageSrc={cropImageSrc}
+            aspectRatio={cropTarget === 'logo' ? 1 : 16 / 9}
+            title={cropTarget === 'logo' ? 'Crop Institute Logo (1:1)' : 'Crop Campus Cover Banner (16:9)'}
+            onCropComplete={cropTarget === 'logo' ? handleLogoCropComplete : handleCoverCropComplete}
+            onCancel={() => setShowCropModal(false)}
+          />
+        )}
 
       </div>
     </>

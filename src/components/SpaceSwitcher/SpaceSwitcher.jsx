@@ -6,6 +6,11 @@ function SpaceSwitcher() {
   const { institutions } = useSpaces()
   const { user } = useAuth()
 
+  // Only render switcher for learners and teachers who switch between individual & institution spaces
+  if (!user || user.accountType === 'institute') {
+    return null
+  }
+
   const isTeacher = user?.accountType === 'teacher'
 
   const individualPath = isTeacher
@@ -21,118 +26,101 @@ function SpaceSwitcher() {
     : '/learner/institutions'
 
   const spaceTitle = isTeacher
-    ? 'Teaching Space'
-    : 'Learning Space'
+    ? 'Teacher Workspace'
+    : 'Learner Workspace'
 
   const individualTitle = isTeacher
-    ? 'Individual Teaching'
-    : 'Individual Learning'
-
-  const institutionTitle = isTeacher
-    ? 'Institution Teaching'
-    : 'Institution Learning'
+    ? 'Freelance & Private Courses'
+    : 'Personal Study & Courses'
 
   return (
-    <div className="mb-3">
+    <div className="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-4 p-2 px-3 rounded-4 glass-panel shadow-sm">
+      <div className="d-flex align-items-center gap-2">
+        <span className="badge-pill-soft bg-primary-subtle text-primary">
+          <i className="bi bi-layers-fill"></i> {spaceTitle}
+        </span>
+      </div>
 
       <div className="dropdown">
-
         <button
-          className="btn dropdown-toggle rounded-pill px-3 py-2"
+          className="btn btn-sm btn-brand-secondary rounded-pill px-3 py-2 dropdown-toggle d-flex align-items-center gap-2 shadow-none"
           type="button"
           data-bs-toggle="dropdown"
           aria-expanded="false"
-          style={{
-            background: '#F5F3FF',
-            color: '#6D28D9',
-            border: '1px solid #E9D5FF',
-            fontSize: '0.85rem',
-            fontWeight: 600
-          }}
         >
-          <i className="bi bi-grid me-2"></i>
-          {spaceTitle}
+          <i className="bi bi-arrow-repeat text-primary"></i>
+          <span>Switch Mode / Institution</span>
         </button>
 
         <ul
-          className="dropdown-menu border-0 rounded-4 p-2"
-          style={{
-            minWidth: '230px',
-            boxShadow:
-              '0 10px 30px rgba(15, 23, 42, 0.10)'
-          }}
+          className="dropdown-menu dropdown-menu-end border-0 rounded-4 p-2 shadow-lg animate-fade-in"
+          style={{ minWidth: '260px' }}
         >
-
-          {/* ================= INDIVIDUAL ================= */}
-
+          <li className="px-3 py-2 text-uppercase text-muted fw-bold" style={{ fontSize: '0.68rem', letterSpacing: '0.05em' }}>
+            Personal Space
+          </li>
           <li>
             <Link
               to={individualPath}
-              className="dropdown-item rounded-3 py-2"
+              className="dropdown-item rounded-3 py-2 d-flex align-items-center gap-2"
             >
-              <i
-                className="bi bi-person-workspace me-2"
-                style={{ color: '#7C3AED' }}
-              ></i>
-
-              {individualTitle}
+              <div
+                className="rounded-2 d-flex align-items-center justify-content-center text-primary bg-primary-subtle"
+                style={{ width: '28px', height: '28px' }}
+              >
+                <i className="bi bi-person-workspace"></i>
+              </div>
+              <div className="lh-sm">
+                <div className="fw-semibold small">{individualTitle}</div>
+                <div className="text-muted" style={{ fontSize: '0.72rem' }}>Self-paced learning</div>
+              </div>
             </Link>
           </li>
 
+          <li><hr className="dropdown-divider my-2 opacity-50" /></li>
 
-          {/* ================= INSTITUTIONS ================= */}
-
-          {institutions.map((institution) => (
-            <li key={institution.id}>
-
-              <Link
-                to={`${institutionPath}/${institution.id}`}
-                className="dropdown-item rounded-3 py-2"
-              >
-                <i
-                  className="bi bi-building me-2"
-                  style={{ color: '#8B5CF6' }}
-                ></i>
-
-                {institution.instituteName}
-
-              </Link>
-
-            </li>
-          ))}
-
-
-          {/* ================= DIVIDER ================= */}
-
-          <li>
-            <hr className="dropdown-divider my-2" />
+          <li className="px-3 py-2 text-uppercase text-muted fw-bold" style={{ fontSize: '0.68rem', letterSpacing: '0.05em' }}>
+            Affiliated Institutions
           </li>
 
+          {institutions && institutions.length > 0 ? (
+            institutions.map((inst) => (
+              <li key={inst._id || inst.id}>
+                <Link
+                  to={`${institutionPath}/${inst._id || inst.id}`}
+                  className="dropdown-item rounded-3 py-2 d-flex align-items-center gap-2"
+                >
+                  <div
+                    className="rounded-2 d-flex align-items-center justify-content-center text-secondary bg-light border"
+                    style={{ width: '28px', height: '28px' }}
+                  >
+                    <i className="bi bi-building"></i>
+                  </div>
+                  <span className="small fw-medium text-truncate">{inst.name || inst.instituteName}</span>
+                </Link>
+              </li>
+            ))
+          ) : (
+            <li className="px-3 py-1 text-muted small fst-italic">
+              No institutions enrolled yet
+            </li>
+          )}
 
-          {/* ================= JOIN ================= */}
+          <li><hr className="dropdown-divider my-2 opacity-50" /></li>
 
           <li>
             <Link
               to={joinPath}
-              className="dropdown-item rounded-3 py-2"
-              style={{
-                color: '#6D28D9'
-              }}
+              className="dropdown-item rounded-3 py-2 text-primary fw-semibold small d-flex align-items-center gap-2"
             >
-              <i className="bi bi-plus-circle me-2"></i>
-
-              Join New Institution
-
+              <i className="bi bi-plus-circle"></i>
+              <span>Discover & Join Institution</span>
             </Link>
           </li>
-
         </ul>
-
       </div>
-
     </div>
   )
 }
 
 export default SpaceSwitcher
-

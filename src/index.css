@@ -1,14 +1,368 @@
-body {
-  margin: 0;
-  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-    sans-serif;
-  background-color: #f8f9fa;
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=JetBrains+Mono:wght@400;500&display=swap');
+
+:root {
+  /* ==========================================================================
+     EduAdapt Core Signature Palette
+     ========================================================================== */
+  --brand-50:  #F5F3FF;
+  --brand-100: #EDE9FE;
+  --brand-200: #DDD6FE;
+  --brand-300: #C4B5FD;
+  --brand-400: #A78BFA;
+  --brand-500: #8B5CF6;
+  --brand-600: #7C3AED;
+  --brand-700: #6D28D9;
+  --brand-800: #5B21B6;
+  --brand-900: #4C1D95;
+
+  /* Bootstrap standard color overrides for universal platform consistency */
+  --bs-primary: #7C3AED;
+  --bs-primary-rgb: 124, 58, 237;
+  --bs-link-color: #7C3AED;
+  --bs-link-hover-color: #6D28D9;
+  --bs-primary-bg-subtle: #F5F3FF;
+  --bs-primary-border-subtle: #DDD6FE;
+  --bs-primary-text-emphasis: #6D28D9;
+
+  /* Neutrals (High-contrast, crisp slate palette) */
+  --slate-950: #090D16;
+  --slate-900: #0F172A;
+  --slate-800: #1E293B;
+  --slate-700: #334155;
+  --slate-600: #475569;
+  --slate-500: #64748B;
+  --slate-400: #94A3B8;
+  --slate-300: #CBD5E1;
+  --slate-200: #E2E8F0;
+  --slate-100: #F1F5F9;
+  --slate-50:  #F8FAFC;
+  --white:     #FFFFFF;
+
+  /* System Semantics */
+  --bg-canvas: #F8F9FC;
+  --bg-surface: #FFFFFF;
+  --border-hairline: #EAECF2;
+  --border-default: #E2E8F0;
+  --border-focus: #7C3AED;
+
+  /* Accents */
+  --emerald-500: #10B981;
+  --emerald-50: #ECFDF5;
+  --amber-500: #F59E0B;
+  --amber-50: #FFFBEB;
+  --rose-500: #EF4444;
+  --rose-50: #FEF2F2;
+  --sky-500: #0EA5E9;
+  --sky-50: #F0F9FF;
+
+  /* Typography scale */
+  --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  /* Elevation (Natural ambient occlusion) */
+  --shadow-xs: 0 1px 2px rgba(15, 23, 42, 0.04);
+  --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.06), 0 1px 2px rgba(15, 23, 42, 0.04);
+  --shadow-md: 0 4px 8px -2px rgba(15, 23, 42, 0.06), 0 2px 4px -2px rgba(15, 23, 42, 0.04);
+  --shadow-lg: 0 12px 20px -4px rgba(15, 23, 42, 0.08), 0 4px 8px -3px rgba(15, 23, 42, 0.03);
+  --shadow-xl: 0 20px 28px -6px rgba(15, 23, 42, 0.1), 0 8px 12px -4px rgba(15, 23, 42, 0.04);
+
+  /* Roundedness */
+  --radius-xs: 6px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
 }
 
-* {
+/* ==========================================================================
+   Base Elements
+   ========================================================================== */
+*, *::before, *::after {
   box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  background-color: var(--bg-canvas);
+  color: var(--slate-800);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  line-height: 1.55;
+  letter-spacing: -0.011em;
+  overflow-x: hidden;
+}
+
+/* Bootstrap primary buttons and elements override */
+.btn-primary {
+  --bs-btn-bg: #7C3AED !important;
+  --bs-btn-border-color: #7C3AED !important;
+  --bs-btn-hover-bg: #6D28D9 !important;
+  --bs-btn-hover-border-color: #6D28D9 !important;
+  --bs-btn-active-bg: #5B21B6 !important;
+  --bs-btn-active-border-color: #5B21B6 !important;
+  --bs-btn-disabled-bg: #C4B5FD !important;
+  --bs-btn-disabled-border-color: #C4B5FD !important;
+  color: #FFFFFF !important;
+}
+
+.btn-outline-primary {
+  --bs-btn-color: #7C3AED !important;
+  --bs-btn-border-color: #7C3AED !important;
+  --bs-btn-hover-bg: #7C3AED !important;
+  --bs-btn-hover-border-color: #7C3AED !important;
+  --bs-btn-active-bg: #6D28D9 !important;
+  --bs-btn-active-border-color: #6D28D9 !important;
+}
+
+.text-primary {
+  color: #7C3AED !important;
+}
+
+.bg-primary {
+  background-color: #7C3AED !important;
+}
+
+.bg-primary-subtle {
+  background-color: #F5F3FF !important;
+}
+
+.border-primary-subtle {
+  border-color: #DDD6FE !important;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--slate-100);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--slate-300);
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--slate-400);
 }
 
 a {
   text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+}
+
+/* Ensure cursor pointer on all interactive controls */
+button,
+[role="button"],
+.btn,
+.nav-link,
+.dropdown-item,
+.dropdown-toggle,
+.form-check-input,
+.page-link,
+.cursor-pointer,
+select,
+input[type="checkbox"],
+input[type="radio"],
+input[type="submit"],
+input[type="button"],
+input[type="reset"],
+input[type="file"]::-webkit-file-upload-button {
+  cursor: pointer !important;
+}
+
+/* Disabled states return to not-allowed / default */
+button:disabled,
+.btn:disabled,
+[disabled] {
+  cursor: not-allowed !important;
+}
+
+/* ==========================================================================
+   Component Architecture: Cards & Panels
+   ========================================================================== */
+.card-pro {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-xs);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.card-pro:hover {
+  box-shadow: var(--shadow-md);
+  border-color: var(--brand-200);
+}
+
+.panel-subtle {
+  background: var(--slate-50);
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--radius-md);
+}
+
+/* ==========================================================================
+   Buttons System
+   ========================================================================== */
+.btn-brand-solid {
+  background: var(--brand-700);
+  color: #FFFFFF !important;
+  font-weight: 600;
+  font-size: 0.875rem;
+  border-radius: var(--radius-md);
+  padding: 0.6rem 1.25rem;
+  border: 1px solid transparent;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  box-shadow: 0 1px 2px rgba(109, 40, 217, 0.2);
+  transition: all 0.15s ease;
+}
+
+.btn-brand-solid:hover {
+  background: var(--brand-800);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(109, 40, 217, 0.25);
+}
+
+.btn-brand-outline {
+  background: transparent;
+  color: var(--brand-700);
+  font-weight: 600;
+  font-size: 0.875rem;
+  border-radius: var(--radius-md);
+  padding: 0.58rem 1.2rem;
+  border: 1px solid var(--brand-200);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: all 0.15s ease;
+}
+
+.btn-brand-outline:hover {
+  background: var(--brand-50);
+  border-color: var(--brand-400);
+  color: var(--brand-800);
+}
+
+.btn-ghost-action {
+  background: transparent;
+  color: var(--slate-600);
+  font-weight: 500;
+  font-size: 0.875rem;
+  border-radius: var(--radius-md);
+  padding: 0.55rem 0.95rem;
+  border: 1px solid transparent;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  transition: all 0.15s ease;
+}
+
+.btn-ghost-action:hover {
+  background: var(--slate-100);
+  color: var(--slate-900);
+}
+
+/* ==========================================================================
+   Badges & Metric Tiles
+   ========================================================================== */
+.badge-meta {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  padding: 0.25rem 0.65rem;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.badge-meta-purple {
+  background: var(--brand-100);
+  color: var(--brand-800);
+  border: 1px solid var(--brand-200);
+}
+
+.badge-meta-emerald {
+  background: var(--emerald-50);
+  color: #065F46;
+  border: 1px solid #A7F3D0;
+}
+
+.badge-meta-amber {
+  background: var(--amber-50);
+  color: #92400E;
+  border: 1px solid #FDE68A;
+}
+
+.badge-meta-sky {
+  background: var(--sky-50);
+  color: #0369A1;
+  border: 1px solid #BAE6FD;
+}
+
+/* Form inputs */
+.form-control, .form-select {
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-default);
+  padding: 0.65rem 0.9rem;
+  font-size: 0.9rem;
+  color: var(--slate-900);
+  background-color: #FFFFFF;
+  transition: all 0.15s ease;
+}
+
+.form-control:focus, .form-select:focus {
+  border-color: var(--brand-500);
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.12);
+  outline: none;
+}
+
+/* Glass Header */
+.header-glass {
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--border-hairline);
+}
+
+/* Required input asterisk */
+.required-star {
+  color: #DC2626;
+  font-weight: 700;
+  margin-left: 3px;
+  user-select: none;
+}
+
+/* Optional input label indicator */
+.optional-tag {
+  color: #94A3B8;
+  font-weight: 400;
+  font-size: 0.82em;
+  margin-left: 5px;
+  text-transform: lowercase;
+}
+
+.hover-primary {
+  transition: color 0.15s ease;
+}
+
+.hover-primary:hover {
+  color: #7C3AED !important;
+  text-decoration: underline !important;
+}
+
+/* Stat card button hover interaction */
+.stat-btn-card:hover {
+  transform: translateY(-2px);
+  border-color: #C4B5FD !important;
+  box-shadow: 0 6px 18px rgba(124, 58, 237, 0.08) !important;
+}
+
+.stat-btn-card:hover .stat-action-link {
+  color: #7C3AED !important;
 }

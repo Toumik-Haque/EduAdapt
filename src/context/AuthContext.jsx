@@ -40,6 +40,19 @@ export const AuthProvider = ({ children }) => {
     setUser(currentUser)
   }
 
+  // Update user in frontend state
+  const updateUser = (fields) => {
+    setUser(currentUser => {
+      if (!currentUser) return currentUser
+      const updatedUser = {
+        ...currentUser,
+        ...fields
+      }
+      localStorage.setItem('user', JSON.stringify(updatedUser))
+      return updatedUser
+    })
+  }
+
   // Update profile in frontend state
   const updateProfile = (updatedProfile) => {
     setUser(currentUser => {
@@ -125,7 +138,8 @@ export const AuthProvider = ({ children }) => {
         loading,
         login,
         logout,
-        updateProfile
+        updateProfile,
+        updateUser
       }}
     >
       {children}

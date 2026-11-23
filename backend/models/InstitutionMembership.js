@@ -29,6 +29,12 @@ const institutionMembershipSchema = new mongoose.Schema(
       ]
     },
 
+    initiatedBy: {
+      type: String,
+      enum: ['user', 'institute'],
+      default: 'user'
+    },
+
     status: {
       type: String,
       required: true,

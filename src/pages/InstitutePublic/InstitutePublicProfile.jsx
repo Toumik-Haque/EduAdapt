@@ -1,11 +1,14 @@
 import { useEffect, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { Link, useParams, useNavigate } from 'react-router-dom'
 
 import { useAuth } from '../../context/AuthContext'
+import GlobalSearchBar from '../../components/GlobalSearchBar/GlobalSearchBar'
 
 function InstitutePublicProfile() {
-  const { instituteId } = useParams()
+  const { username, instituteId } = useParams()
+  const instituteIdentifier = username || instituteId
   const { user } = useAuth()
+  const navigate = useNavigate()
 
   const [institute, setInstitute] = useState(null)
   const [batches, setBatches] = useState([])
@@ -16,7 +19,7 @@ function InstitutePublicProfile() {
     const fetchInstitute = async () => {
       try {
         const response = await fetch(
-          `http://localhost:5000/api/membership/public/institute/${instituteId}`
+          `http://localhost:5000/api/membership/public/institute/${instituteIdentifier}`
         )
 
         const data = await response.json()
@@ -30,7 +33,7 @@ function InstitutePublicProfile() {
         setInstitute(data.institute)
 
         const batchResponse = await fetch(
-          `http://localhost:5000/api/membership/public/institute/${instituteId}/batches`
+          `http://localhost:5000/api/membership/public/institute/${instituteIdentifier}/batches`
         )
 
         const batchData = await batchResponse.json()
@@ -50,7 +53,7 @@ function InstitutePublicProfile() {
     }
 
     fetchInstitute()
-  }, [instituteId])
+  }, [instituteIdentifier])
 
   /* =========================
      STATES
@@ -802,6 +805,30 @@ function InstitutePublicProfile() {
       <div className="edu-profile-page">
         <div className="edu-profile-container py-3 py-md-4">
 
+          {/* ================= TOP NAVIGATION & SEARCH ================= */}
+          <div className="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-4">
+            <button
+              type="button"
+              className="btn btn-sm btn-white border rounded-pill px-3 py-2 text-decoration-none d-inline-flex align-items-center gap-2 text-secondary shadow-xs bg-white"
+              onClick={() => {
+                if (window.history.length > 1) {
+                  navigate(-1)
+                } else if (user?.accountType) {
+                  navigate(`/${user.accountType}`)
+                } else {
+                  navigate('/')
+                }
+              }}
+            >
+              <i className="bi bi-arrow-left" />
+              <span className="fw-semibold">Back to Dashboard</span>
+            </button>
+
+            <div className="flex-grow-1 d-flex justify-content-end" style={{ maxWidth: '520px' }}>
+              <GlobalSearchBar />
+            </div>
+          </div>
+
           {/* ================= COVER ================= */}
 
           <div className="edu-cover">
@@ -819,14 +846,7 @@ function InstitutePublicProfile() {
               </>
             )}
 
-            <div className="edu-cover-overlay" />
-
-            <div className="edu-cover-content">
-              <div className="edu-cover-label">
-                <i className="bi bi-mortarboard-fill" />
-                EduAdapt Institution
-              </div>
-            </div>
+            <div className="edu-cover-overlay" />  
 
           </div>
 

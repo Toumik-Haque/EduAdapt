@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import { useAuth } from '../../context/AuthContext'
+import InteractiveNoticeBoard from '../../components/InteractiveNoticeBoard/InteractiveNoticeBoard'
 
 function Teacher() {
   const { token, user } = useAuth()
@@ -93,49 +94,33 @@ function Teacher() {
       }}
     >
 
-      <div className="container py-4 px-3">
+      <div className="container-fluid px-0">
 
-        <div className='d-flex justify-content-between mb-3'>
+        <div className='d-flex justify-content-between align-items-center mb-3'>
 
-          <div
-            className="d-inline-flex align-items-center gap-2 rounded-pill px-3 py-2"
-            style={{
-              background: '#F5F3FF',
-              color: '#7C3AED',
-              border: '1px solid #E9D5FF',
-              fontSize: '0.8rem',
-              fontWeight: 600
-            }}
-          >
-            <i className="bi bi-stars"></i>
-            TEACHING ECOSYSTEM
+          <div className="badge-meta badge-meta-sky">
+            <i className="bi bi-mortarboard-fill"></i>
+            <span>FACULTY WORKSPACE</span>
           </div>
 
           <Link
             to="/teacher/profile"
-            className="btn text-decoration-none"
-            style={{
-              background: '#7C3AED',
-              color: '#F5F3FF',
-              border: '1px solid #E9D5FF',
-              borderRadius: '10px',
-              padding: '6px 14px',
-              fontWeight: '500'
-            }}
+            className="btn btn-sm btn-light border rounded-pill px-3 py-1 text-secondary"
           >
-            Edit Profile
+            <i className="bi bi-person-circle me-1"></i>
+            <span>Faculty Profile</span>
           </Link>
 
         </div>
 
         {/* ================= HEADER ================= */}
-        <div className="col-lg-8 mb-4">
+        <div className="mb-4">
 
           <h2
-            className="fw-bold mb-2"
+            className="fw-extrabold text-dark mb-1"
             style={{
-              fontSize: 'clamp(2rem, 4vw, 3rem)',
-              letterSpacing: '-1px'
+              letterSpacing: '-0.02em',
+              lineHeight: 1.2
             }}
           >
             Hi, {user?.profile?.fullName}
