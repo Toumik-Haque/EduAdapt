@@ -1,3 +1,4 @@
+import { API_BASE_URL } from '../../config/api'
 import { useEffect, useState } from 'react'
 import { useAuth } from '../../context/AuthContext'
 import { useModal } from '../../context/ModalContext'
@@ -30,7 +31,7 @@ function StudyMaterials({ subjectId, batchId, isTeacher = false }) {
     if (!subjectId) return
     try {
       setLoading(true)
-      const res = await fetch(`http://localhost:5000/api/materials/subject/${subjectId}`, {
+      const res = await fetch(`${API_BASE_URL}/api/materials/subject/${subjectId}`, {
         headers: { Authorization: `Bearer ${token}` }
       })
       const data = await res.json()
@@ -53,7 +54,7 @@ function StudyMaterials({ subjectId, batchId, isTeacher = false }) {
     if (!title.trim() || !batchId || !subjectId) return
     try {
       setSaving(true)
-      const res = await fetch('http://localhost:5000/api/materials', {
+      const res = await fetch(`${API_BASE_URL}/api/materials`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -98,7 +99,7 @@ function StudyMaterials({ subjectId, batchId, isTeacher = false }) {
     )
     if (!confirmed) return
     try {
-      const res = await fetch(`http://localhost:5000/api/materials/${matId}`, {
+      const res = await fetch(`${API_BASE_URL}/api/materials/${matId}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` }
       })
@@ -118,7 +119,7 @@ function StudyMaterials({ subjectId, batchId, isTeacher = false }) {
       // Fetch all submissions for teacher
       setLoadingSubmissions(true)
       try {
-        const res = await fetch(`http://localhost:5000/api/materials/submissions/${mat._id}`, {
+        const res = await fetch(`${API_BASE_URL}/api/materials/submissions/${mat._id}`, {
           headers: { Authorization: `Bearer ${token}` }
         })
         const data = await res.json()
@@ -131,7 +132,7 @@ function StudyMaterials({ subjectId, batchId, isTeacher = false }) {
     } else {
       // Fetch learner's own submission
       try {
-        const res = await fetch(`http://localhost:5000/api/materials/submission/${mat._id}`, {
+        const res = await fetch(`${API_BASE_URL}/api/materials/submission/${mat._id}`, {
           headers: { Authorization: `Bearer ${token}` }
         })
         const data = await res.json()
@@ -153,7 +154,7 @@ function StudyMaterials({ subjectId, batchId, isTeacher = false }) {
     if (!submissionText.trim() || !activeMaterial) return
     try {
       setSubmitting(true)
-      const res = await fetch(`http://localhost:5000/api/materials/submit/${activeMaterial._id}`, {
+      const res = await fetch(`${API_BASE_URL}/api/materials/submit/${activeMaterial._id}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -181,7 +182,7 @@ function StudyMaterials({ subjectId, batchId, isTeacher = false }) {
     const grade = gradeInput[subId]
     const feedback = feedbackInput[subId]
     try {
-      const res = await fetch(`http://localhost:5000/api/materials/grade/${subId}`, {
+      const res = await fetch(`${API_BASE_URL}/api/materials/grade/${subId}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

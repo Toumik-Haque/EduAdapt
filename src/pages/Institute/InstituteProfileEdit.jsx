@@ -1,3 +1,4 @@
+import { API_BASE_URL } from '../../config/api'
 import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
@@ -71,7 +72,7 @@ function InstituteProfileEdit() {
         setError('')
 
         const response = await fetch(
-          'http://localhost:5000/api/membership/institute/profile',
+          `${API_BASE_URL}/api/membership/institute/profile`,
           {
             headers: {
               Authorization: `Bearer ${token}`
@@ -170,7 +171,7 @@ function InstituteProfileEdit() {
       setError('')
 
       const response = await fetch(
-        'http://localhost:5000/api/membership/institute/profile',
+        `${API_BASE_URL}/api/membership/institute/profile`,
         {
           method: 'PUT',
           headers: {
@@ -233,7 +234,7 @@ function InstituteProfileEdit() {
       setError('')
       setMessage('')
 
-      const res = await fetch('http://localhost:5000/api/membership/institute/profile/photo', {
+      const res = await fetch(`${API_BASE_URL}/api/membership/institute/profile/photo`, {
         method: 'DELETE',
         headers: {
           Authorization: `Bearer ${token}`
@@ -271,7 +272,7 @@ function InstituteProfileEdit() {
       setError('')
       setMessage('')
 
-      const res = await fetch('http://localhost:5000/api/membership/institute/profile/cover', {
+      const res = await fetch(`${API_BASE_URL}/api/membership/institute/profile/cover`, {
         method: 'DELETE',
         headers: {
           Authorization: `Bearer ${token}`
@@ -320,7 +321,7 @@ function InstituteProfileEdit() {
       formData.append('profilePhoto', croppedFile)
 
       const response = await fetch(
-        'http://localhost:5000/api/membership/institute/profile/photo',
+        `${API_BASE_URL}/api/membership/institute/profile/photo`,
         {
           method: 'POST',
           headers: {
@@ -384,7 +385,7 @@ function InstituteProfileEdit() {
       formData.append('coverPhoto', croppedFile)
 
       const response = await fetch(
-        'http://localhost:5000/api/membership/institute/profile/cover',
+        `${API_BASE_URL}/api/membership/institute/profile/cover`,
         {
           method: 'POST',
           headers: {
@@ -1882,7 +1883,7 @@ function InstituteProfileEdit() {
 
                   try {
                     setDeleting(true)
-                    const res = await fetch('http://localhost:5000/api/auth/delete-account', {
+                    const res = await fetch(`${API_BASE_URL}/api/auth/delete-account`, {
                       method: 'DELETE',
                       headers: {
                         Authorization: `Bearer ${token}`

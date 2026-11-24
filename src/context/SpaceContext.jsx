@@ -1,3 +1,4 @@
+import { API_BASE_URL } from '../config/api'
 import {
   createContext,
   useContext,
@@ -31,12 +32,12 @@ export function SpaceProvider({ children }) {
 
       if (user.accountType === 'learner') {
         endpoint =
-          'http://localhost:5000/api/membership/my-institutions'
+          `${API_BASE_URL}/api/membership/my-institutions`
       }
 
       if (user.accountType === 'teacher') {
         endpoint =
-          'http://localhost:5000/api/membership/teacher/batches'
+          `${API_BASE_URL}/api/membership/teacher/batches`
       }
 
       if (!endpoint) {

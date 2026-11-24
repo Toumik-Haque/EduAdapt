@@ -1,3 +1,4 @@
+import { API_BASE_URL } from '../../config/api'
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
@@ -19,7 +20,7 @@ function ManageStudents() {
       setLoading(true)
       setError('')
 
-      const res = await fetch('http://localhost:5000/api/membership/institute/batch-overview', {
+      const res = await fetch(`${API_BASE_URL}/api/membership/institute/batch-overview`, {
         headers: { Authorization: `Bearer ${token}` }
       })
       const data = await res.json()

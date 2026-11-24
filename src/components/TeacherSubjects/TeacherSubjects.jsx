@@ -1,3 +1,4 @@
+import { API_BASE_URL } from '../../config/api'
 import { useEffect, useState } from 'react'
 import { useAuth } from '../../context/AuthContext'
 
@@ -16,7 +17,7 @@ function TeacherSubjects() {
       setError('')
 
       const response = await fetch(
-        'http://localhost:5000/api/membership/teacher/batches',
+        `${API_BASE_URL}/api/membership/teacher/batches`,
         {
           headers: {
             Authorization: `Bearer ${token}`

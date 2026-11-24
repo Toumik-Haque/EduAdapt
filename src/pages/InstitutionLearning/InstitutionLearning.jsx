@@ -1,3 +1,4 @@
+import { API_BASE_URL } from '../../config/api'
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 
@@ -26,7 +27,7 @@ function InstitutionLearning() {
   const fetchInstitution = async () => {
     try {
       const response = await fetch(
-        `http://localhost:5000/api/membership/institutions/${instituteId}`,
+        `${API_BASE_URL}/api/membership/institutions/${instituteId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`
@@ -58,7 +59,7 @@ function InstitutionLearning() {
   const fetchBatches = async () => {
     try {
       const response = await fetch(
-        'http://localhost:5000/api/membership/my-memberships',
+        `${API_BASE_URL}/api/membership/my-memberships`,
         {
           headers: {
             Authorization: `Bearer ${token}`
@@ -107,7 +108,7 @@ function InstitutionLearning() {
       setError('')
 
       const response = await fetch(
-        `http://localhost:5000/api/subjects/batch/${batchId}`,
+        `${API_BASE_URL}/api/subjects/batch/${batchId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`

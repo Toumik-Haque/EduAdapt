@@ -1,3 +1,4 @@
+import { API_BASE_URL } from '../../config/api'
 import { Link } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import { useAuth } from '../../context/AuthContext'
@@ -15,7 +16,7 @@ function Learner() {
     const fetchInstitutions = async () => {
       try {
         const response = await fetch(
-          'http://localhost:5000/api/membership/my-institutions',
+          `${API_BASE_URL}/api/membership/my-institutions`,
           {
             headers: {
               Authorization: `Bearer ${token}`

@@ -1,3 +1,4 @@
+import { API_BASE_URL } from '../../config/api'
 import { useEffect, useState } from 'react'
 import SpaceSwitcher from '../../components/SpaceSwitcher/SpaceSwitcher'
 import { useAuth } from '../../context/AuthContext'
@@ -31,7 +32,7 @@ function JoinInstitution() {
       setError('')
 
       const response = await fetch(
-        `http://localhost:5000/api/membership/institutions?search=${encodeURIComponent(search)}`,
+        `${API_BASE_URL}/api/membership/institutions?search=${encodeURIComponent(search)}`,
         {
           headers: {
             Authorization: `Bearer ${token}`
@@ -67,8 +68,8 @@ function JoinInstitution() {
   const fetchMemberships = async () => {
     try {
       const endpoint = isTeacher
-        ? 'http://localhost:5000/api/membership/teacher/batches'
-        : 'http://localhost:5000/api/membership/my-memberships'
+        ? `${API_BASE_URL}/api/membership/teacher/batches`
+        : `${API_BASE_URL}/api/membership/my-memberships`
 
       const response = await fetch(
         endpoint,
@@ -108,7 +109,7 @@ function JoinInstitution() {
         institutionList.map(
           async (institution) => {
             const response = await fetch(
-              `http://localhost:5000/api/batches/institution/${institution.id}`,
+              `${API_BASE_URL}/api/batches/institution/${institution.id}`,
               {
                 headers: {
                   Authorization: `Bearer ${token}`
@@ -191,7 +192,7 @@ function JoinInstitution() {
       setBatchLoading(true)
 
       const response = await fetch(
-        `http://localhost:5000/api/batches/institution/${institution.id}`,
+        `${API_BASE_URL}/api/batches/institution/${institution.id}`,
         {
           headers: {
             Authorization: `Bearer ${token}`
@@ -253,8 +254,8 @@ function JoinInstitution() {
       setSuccess('')
 
       const endpoint = isTeacher
-        ? 'http://localhost:5000/api/membership/teacher/join'
-        : 'http://localhost:5000/api/membership/join'
+        ? `${API_BASE_URL}/api/membership/teacher/join`
+        : `${API_BASE_URL}/api/membership/join`
 
       const response = await fetch(
         endpoint,
@@ -314,8 +315,8 @@ function JoinInstitution() {
       setSuccess('')
 
       const endpoint = isTeacher
-        ? 'http://localhost:5000/api/membership/teacher/cancel'
-        : 'http://localhost:5000/api/membership/cancel'
+        ? `${API_BASE_URL}/api/membership/teacher/cancel`
+        : `${API_BASE_URL}/api/membership/cancel`
 
       const response = await fetch(
         endpoint,
@@ -376,8 +377,8 @@ function JoinInstitution() {
       setSuccess('')
 
       const endpoint = isTeacher
-        ? 'http://localhost:5000/api/membership/teacher/leave'
-        : 'http://localhost:5000/api/membership/leave'
+        ? `${API_BASE_URL}/api/membership/teacher/leave`
+        : `${API_BASE_URL}/api/membership/leave`
 
       const response = await fetch(
         endpoint,

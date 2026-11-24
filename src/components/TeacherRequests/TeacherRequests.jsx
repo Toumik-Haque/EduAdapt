@@ -1,3 +1,4 @@
+import { API_BASE_URL } from '../../config/api'
 import { useEffect, useState, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
@@ -22,7 +23,7 @@ function TeacherRequests() {
       setError('')
 
       const response = await fetch(
-        'http://localhost:5000/api/membership/teacher/requests',
+        `${API_BASE_URL}/api/membership/teacher/requests`,
         {
           headers: {
             Authorization: `Bearer ${token}`
@@ -60,7 +61,7 @@ function TeacherRequests() {
       setSuccess('')
 
       const response = await fetch(
-        'http://localhost:5000/api/membership/teacher/approve',
+        `${API_BASE_URL}/api/membership/teacher/approve`,
         {
           method: 'POST',
           headers: {
@@ -96,7 +97,7 @@ function TeacherRequests() {
       setSuccess('')
 
       const response = await fetch(
-        'http://localhost:5000/api/membership/teacher/reject',
+        `${API_BASE_URL}/api/membership/teacher/reject`,
         {
           method: 'POST',
           headers: {

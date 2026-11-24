@@ -1,3 +1,4 @@
+import { API_BASE_URL } from '../../config/api'
 import { useEffect, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
@@ -54,7 +55,7 @@ function TeacherInstitution() {
       setLearnersError('')
 
       const response = await fetch(
-        'http://localhost:5000/api/membership/teacher/learner-requests',
+        `${API_BASE_URL}/api/membership/teacher/learner-requests`,
         {
           headers: {
             Authorization: `Bearer ${token}`
@@ -102,8 +103,8 @@ function TeacherInstitution() {
 
       const endpoint =
         action === 'approve'
-          ? 'http://localhost:5000/api/membership/teacher/learner-approve'
-          : 'http://localhost:5000/api/membership/teacher/learner-reject'
+          ? `${API_BASE_URL}/api/membership/teacher/learner-approve`
+          : `${API_BASE_URL}/api/membership/teacher/learner-reject`
 
       const response = await fetch(endpoint, {
         method: 'POST',
@@ -161,7 +162,7 @@ function TeacherInstitution() {
       setApprovedLearnersError('')
 
       const response = await fetch(
-        `http://localhost:5000/api/membership/teacher/learners?batchId=${selectedBatch.batchId}`,
+        `${API_BASE_URL}/api/membership/teacher/learners?batchId=${selectedBatch.batchId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`
@@ -209,7 +210,7 @@ function TeacherInstitution() {
       setSubjectsError('')
 
       const response = await fetch(
-        `http://localhost:5000/api/subjects/batch/${batchId}`,
+        `${API_BASE_URL}/api/subjects/batch/${batchId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`
@@ -266,7 +267,7 @@ function TeacherInstitution() {
       setCreateSubjectSuccess('')
 
       const response = await fetch(
-        'http://localhost:5000/api/subjects',
+        `${API_BASE_URL}/api/subjects`,
         {
           method: 'POST',
           headers: {
@@ -329,7 +330,7 @@ function TeacherInstitution() {
         setError('')
 
         const response = await fetch(
-          'http://localhost:5000/api/membership/teacher/batches',
+          `${API_BASE_URL}/api/membership/teacher/batches`,
           {
             headers: {
               Authorization: `Bearer ${token}`

@@ -1,3 +1,4 @@
+import { API_BASE_URL } from '../../config/api'
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import SpaceSwitcher from '../../components/SpaceSwitcher/SpaceSwitcher'
@@ -24,7 +25,7 @@ function IndividualLearning() {
 
   const fetchEnrolled = async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/individual-courses/enrolled', {
+      const res = await fetch(`${API_BASE_URL}/api/individual-courses/enrolled`, {
         headers: { Authorization: `Bearer ${token}` }
       })
       const data = await res.json()
@@ -38,7 +39,7 @@ function IndividualLearning() {
 
   const fetchAvailable = async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/individual-courses/available', {
+      const res = await fetch(`${API_BASE_URL}/api/individual-courses/available`, {
         headers: { Authorization: `Bearer ${token}` }
       })
       const data = await res.json()
@@ -65,7 +66,7 @@ function IndividualLearning() {
       setEnrolling(true)
       setError('')
       setSuccessMsg('')
-      const res = await fetch('http://localhost:5000/api/individual-courses/enroll', {
+      const res = await fetch(`${API_BASE_URL}/api/individual-courses/enroll`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -92,7 +93,7 @@ function IndividualLearning() {
     setSelectedCourse(course)
     setLoadingMaterials(true)
     try {
-      const res = await fetch(`http://localhost:5000/api/materials/course/${course._id}`, {
+      const res = await fetch(`${API_BASE_URL}/api/materials/course/${course._id}`, {
         headers: { Authorization: `Bearer ${token}` }
       })
       const data = await res.json()
@@ -111,7 +112,7 @@ function IndividualLearning() {
     setSubmissionText('')
     setMySubmission(null)
     try {
-      const res = await fetch(`http://localhost:5000/api/materials/submission/${material._id}`, {
+      const res = await fetch(`${API_BASE_URL}/api/materials/submission/${material._id}`, {
         headers: { Authorization: `Bearer ${token}` }
       })
       const data = await res.json()
@@ -129,7 +130,7 @@ function IndividualLearning() {
     if (!submissionText.trim()) return
     try {
       setSubmitting(true)
-      const res = await fetch(`http://localhost:5000/api/materials/submit/${submissionModal._id}`, {
+      const res = await fetch(`${API_BASE_URL}/api/materials/submit/${submissionModal._id}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -154,7 +155,7 @@ function IndividualLearning() {
 
   const updateCourseProgress = async (courseId, newProgress) => {
     try {
-      const res = await fetch(`http://localhost:5000/api/individual-courses/progress/${courseId}`, {
+      const res = await fetch(`${API_BASE_URL}/api/individual-courses/progress/${courseId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

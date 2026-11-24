@@ -1,3 +1,4 @@
+import { API_BASE_URL } from '../../config/api'
 import { useEffect, useState, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
@@ -17,7 +18,7 @@ function NotificationBell() {
   const fetchNotifications = async () => {
     if (!token) return
     try {
-      const res = await fetch('http://localhost:5000/api/notifications', {
+      const res = await fetch(`${API_BASE_URL}/api/notifications`, {
         headers: { Authorization: `Bearer ${token}` }
       })
       const data = await res.json()
@@ -52,7 +53,7 @@ function NotificationBell() {
     setOpen((prev) => !prev)
     if (!open && unreadCount > 0) {
       // Mark all as read
-      fetch('http://localhost:5000/api/notifications/read-all', {
+      fetch(`${API_BASE_URL}/api/notifications/read-all`, {
         method: 'PATCH',
         headers: { Authorization: `Bearer ${token}` }
       }).then(() => {
@@ -64,7 +65,7 @@ function NotificationBell() {
   const handleAccept = async (notif) => {
     try {
       setActingId(notif._id)
-      const res = await fetch(`http://localhost:5000/api/notifications/${notif._id}/accept`, {
+      const res = await fetch(`${API_BASE_URL}/api/notifications/${notif._id}/accept`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` }
       })
@@ -83,7 +84,7 @@ function NotificationBell() {
   const handleDecline = async (notif) => {
     try {
       setActingId(notif._id)
-      const res = await fetch(`http://localhost:5000/api/notifications/${notif._id}/decline`, {
+      const res = await fetch(`${API_BASE_URL}/api/notifications/${notif._id}/decline`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` }
       })

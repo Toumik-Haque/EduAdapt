@@ -1,3 +1,4 @@
+import { API_BASE_URL } from '../../config/api'
 import { useEffect, useState } from 'react'
 import { Link, useParams, useNavigate } from 'react-router-dom'
 
@@ -19,7 +20,7 @@ function InstitutePublicProfile() {
     const fetchInstitute = async () => {
       try {
         const response = await fetch(
-          `http://localhost:5000/api/membership/public/institute/${instituteIdentifier}`
+          `${API_BASE_URL}/api/membership/public/institute/${instituteIdentifier}`
         )
 
         const data = await response.json()
@@ -33,7 +34,7 @@ function InstitutePublicProfile() {
         setInstitute(data.institute)
 
         const batchResponse = await fetch(
-          `http://localhost:5000/api/membership/public/institute/${instituteIdentifier}/batches`
+          `${API_BASE_URL}/api/membership/public/institute/${instituteIdentifier}/batches`
         )
 
         const batchData = await batchResponse.json()

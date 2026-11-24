@@ -1,3 +1,4 @@
+import { API_BASE_URL } from '../../config/api'
 import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 
@@ -46,7 +47,7 @@ function ForgotPassword() {
 
     try {
       const response = await fetch(
-        'http://localhost:5000/api/auth/send-password-reset-otp',
+        `${API_BASE_URL}/api/auth/send-password-reset-otp`,
         {
           method: 'POST',
           headers: {
@@ -120,7 +121,7 @@ function ForgotPassword() {
 
     try {
       const response = await fetch(
-        'http://localhost:5000/api/auth/reset-password',
+        `${API_BASE_URL}/api/auth/reset-password`,
         {
           method: 'POST',
           headers: {

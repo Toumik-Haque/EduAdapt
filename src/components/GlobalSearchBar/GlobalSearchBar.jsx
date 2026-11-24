@@ -1,3 +1,4 @@
+import { API_BASE_URL } from '../../config/api'
 import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
@@ -43,7 +44,7 @@ export default function GlobalSearchBar() {
           headers.Authorization = `Bearer ${token}`
         }
         const res = await fetch(
-          `http://localhost:5000/api/auth/search-profiles?q=${encodeURIComponent(query.trim())}`,
+          `${API_BASE_URL}/api/auth/search-profiles?q=${encodeURIComponent(query.trim())}`,
           { headers }
         )
         const data = await res.json()

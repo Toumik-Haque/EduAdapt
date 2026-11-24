@@ -1,3 +1,4 @@
+import { API_BASE_URL } from '../../config/api'
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
@@ -29,7 +30,7 @@ function Community() {
   const fetchPosts = async () => {
     try {
       setLoading(true)
-      let url = `http://localhost:5000/api/community?category=${activeCategory}`
+      let url = `${API_BASE_URL}/api/community?category=${activeCategory}`
       if (searchQuery.trim()) {
         url += `&search=${encodeURIComponent(searchQuery.trim())}`
       }
@@ -61,7 +62,7 @@ function Community() {
     if (!title.trim() || !content.trim()) return
     try {
       setPublishing(true)
-      const res = await fetch('http://localhost:5000/api/community', {
+      const res = await fetch(`${API_BASE_URL}/api/community`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -92,7 +93,7 @@ function Community() {
 
   const handleLike = async (postId) => {
     try {
-      const res = await fetch(`http://localhost:5000/api/community/${postId}/like`, {
+      const res = await fetch(`${API_BASE_URL}/api/community/${postId}/like`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` }
       })
@@ -121,7 +122,7 @@ function Community() {
     const text = commentInputs[postId]
     if (!text || !text.trim()) return
     try {
-      const res = await fetch(`http://localhost:5000/api/community/${postId}/comment`, {
+      const res = await fetch(`${API_BASE_URL}/api/community/${postId}/comment`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -155,7 +156,7 @@ function Community() {
     )
     if (!confirmed) return
     try {
-      const res = await fetch(`http://localhost:5000/api/community/${postId}`, {
+      const res = await fetch(`${API_BASE_URL}/api/community/${postId}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` }
       })

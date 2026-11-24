@@ -1,3 +1,4 @@
+import { API_BASE_URL } from '../../config/api'
 import { useEffect, useState } from 'react'
 import { useAuth } from '../../context/AuthContext'
 
@@ -20,8 +21,8 @@ function InteractiveNoticeBoard({
     try {
       setLoading(true)
       const url = institutionId
-        ? `http://localhost:5000/api/announcements?institutionId=${institutionId}`
-        : 'http://localhost:5000/api/announcements'
+        ? `${API_BASE_URL}/api/announcements?institutionId=${institutionId}`
+        : `${API_BASE_URL}/api/announcements`
       const res = await fetch(url, {
         headers: { Authorization: `Bearer ${token}` }
       })
@@ -45,7 +46,7 @@ function InteractiveNoticeBoard({
     if (!title.trim() || !message.trim()) return
     try {
       setPosting(true)
-      const res = await fetch('http://localhost:5000/api/announcements', {
+      const res = await fetch(`${API_BASE_URL}/api/announcements`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -76,7 +77,7 @@ function InteractiveNoticeBoard({
   const handleDelete = async (id) => {
     if (!window.confirm('Delete this announcement?')) return
     try {
-      const res = await fetch(`http://localhost:5000/api/announcements/${id}`, {
+      const res = await fetch(`${API_BASE_URL}/api/announcements/${id}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` }
       })

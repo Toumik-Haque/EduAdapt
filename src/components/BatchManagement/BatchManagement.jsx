@@ -1,3 +1,4 @@
+import { API_BASE_URL } from '../../config/api'
 import { useEffect, useState, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
@@ -29,7 +30,7 @@ function BatchManagement() {
       setError('')
 
       const response = await fetch(
-        'http://localhost:5000/api/batches/my',
+        `${API_BASE_URL}/api/batches/my`,
         {
           headers: {
             Authorization: `Bearer ${token}`
@@ -109,8 +110,8 @@ function BatchManagement() {
       setSubmitting(true)
 
       const url = editingBatchId
-        ? `http://localhost:5000/api/batches/${editingBatchId}`
-        : 'http://localhost:5000/api/batches'
+        ? `${API_BASE_URL}/api/batches/${editingBatchId}`
+        : `${API_BASE_URL}/api/batches`
       const method = editingBatchId ? 'PUT' : 'POST'
 
       const response = await fetch(url, {
@@ -171,7 +172,7 @@ function BatchManagement() {
     try {
       setDeletingId(batch._id)
 
-      const response = await fetch(`http://localhost:5000/api/batches/${batch._id}`, {
+      const response = await fetch(`${API_BASE_URL}/api/batches/${batch._id}`, {
         method: 'DELETE',
         headers: {
           Authorization: `Bearer ${token}`

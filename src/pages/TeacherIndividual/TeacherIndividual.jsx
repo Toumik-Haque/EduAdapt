@@ -1,3 +1,4 @@
+import { API_BASE_URL } from '../../config/api'
 import { useEffect, useState } from 'react'
 import SpaceSwitcher from '../../components/SpaceSwitcher/SpaceSwitcher'
 import { useAuth } from '../../context/AuthContext'
@@ -46,7 +47,7 @@ function TeacherIndividual() {
   const fetchCourses = async () => {
     try {
       setLoading(true)
-      const res = await fetch('http://localhost:5000/api/individual-courses/teacher', {
+      const res = await fetch(`${API_BASE_URL}/api/individual-courses/teacher`, {
         headers: { Authorization: `Bearer ${token}` }
       })
       const data = await res.json()
@@ -71,7 +72,7 @@ function TeacherIndividual() {
     try {
       setCreating(true)
       setError('')
-      const res = await fetch('http://localhost:5000/api/individual-courses/create', {
+      const res = await fetch(`${API_BASE_URL}/api/individual-courses/create`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -108,7 +109,7 @@ function TeacherIndividual() {
     setSelectedCourse(course)
     setLoadingMaterials(true)
     try {
-      const res = await fetch(`http://localhost:5000/api/materials/course/${course._id}`, {
+      const res = await fetch(`${API_BASE_URL}/api/materials/course/${course._id}`, {
         headers: { Authorization: `Bearer ${token}` }
       })
       const data = await res.json()
@@ -127,7 +128,7 @@ function TeacherIndividual() {
     if (!matTitle.trim() || !selectedCourse) return
     try {
       setCreatingMaterial(true)
-      const res = await fetch('http://localhost:5000/api/materials', {
+      const res = await fetch(`${API_BASE_URL}/api/materials`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -168,7 +169,7 @@ function TeacherIndividual() {
     )
     if (!confirmed) return
     try {
-      const res = await fetch(`http://localhost:5000/api/materials/${materialId}`, {
+      const res = await fetch(`${API_BASE_URL}/api/materials/${materialId}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` }
       })
@@ -186,7 +187,7 @@ function TeacherIndividual() {
     setActiveMaterial(material)
     setLoadingSubmissions(true)
     try {
-      const res = await fetch(`http://localhost:5000/api/materials/submissions/${material._id}`, {
+      const res = await fetch(`${API_BASE_URL}/api/materials/submissions/${material._id}`, {
         headers: { Authorization: `Bearer ${token}` }
       })
       const data = await res.json()
@@ -204,7 +205,7 @@ function TeacherIndividual() {
     const grade = gradeInput[submissionId]
     const feedback = feedbackInput[submissionId]
     try {
-      const res = await fetch(`http://localhost:5000/api/materials/grade/${submissionId}`, {
+      const res = await fetch(`${API_BASE_URL}/api/materials/grade/${submissionId}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

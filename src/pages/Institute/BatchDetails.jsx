@@ -1,3 +1,4 @@
+import { API_BASE_URL } from '../../config/api'
 import { useEffect, useState } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
@@ -42,7 +43,7 @@ function BatchDetails() {
       setLoading(true)
       setError('')
 
-      const res = await fetch(`http://localhost:5000/api/batches/${batchId}/details`, {
+      const res = await fetch(`${API_BASE_URL}/api/batches/${batchId}/details`, {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -90,7 +91,7 @@ function BatchDetails() {
         setInviteSuccessMsg('')
 
         const res = await fetch(
-          `http://localhost:5000/api/batches/teachers/search?q=${encodeURIComponent(
+          `${API_BASE_URL}/api/batches/teachers/search?q=${encodeURIComponent(
             query
           )}&batchId=${batchId}`,
           {
@@ -120,7 +121,7 @@ function BatchDetails() {
       setInviteErrorMsg('')
       setInviteSuccessMsg('')
 
-      const res = await fetch(`http://localhost:5000/api/batches/${batchId}/invite-teacher`, {
+      const res = await fetch(`${API_BASE_URL}/api/batches/${batchId}/invite-teacher`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

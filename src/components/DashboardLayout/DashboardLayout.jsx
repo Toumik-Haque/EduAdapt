@@ -1,3 +1,4 @@
+import { API_BASE_URL } from '../../config/api'
 import { useState, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
@@ -20,7 +21,7 @@ function DashboardLayout({ children }) {
   // If institute, fetch fresh profile info (photo, instituteName) if not already synced
   useEffect(() => {
     if (isInstitute && token) {
-      fetch('http://localhost:5000/api/membership/institute/profile', {
+      fetch(`${API_BASE_URL}/api/membership/institute/profile`, {
         headers: { Authorization: `Bearer ${token}` }
       })
         .then(res => res.json())

@@ -1,3 +1,4 @@
+import { API_BASE_URL } from '../../config/api'
 import { useEffect, useState } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
@@ -21,7 +22,7 @@ export default function UserPublicProfile() {
         setLoading(true)
         setError('')
 
-        const res = await fetch(`http://localhost:5000/api/auth/public/user/${userIdentifier}`)
+        const res = await fetch(`${API_BASE_URL}/api/auth/public/user/${userIdentifier}`)
         const data = await res.json()
 
         if (!res.ok) {

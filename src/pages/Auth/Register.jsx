@@ -1,3 +1,4 @@
+import { API_BASE_URL } from '../../config/api'
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 
@@ -70,7 +71,7 @@ function Register() {
 
     try {
       const response = await fetch(
-        'http://localhost:5000/api/auth/send-registration-otp',
+        `${API_BASE_URL}/api/auth/send-registration-otp`,
         {
           method: 'POST',
           headers: {
@@ -153,7 +154,7 @@ function Register() {
 
     try {
       const response = await fetch(
-        'http://localhost:5000/api/auth/register',
+        `${API_BASE_URL}/api/auth/register`,
         {
           method: 'POST',
           headers: {

@@ -1,3 +1,4 @@
+import { API_BASE_URL } from '../../config/api'
 import { useEffect, useState } from 'react'
 import { useAuth } from '../../context/AuthContext'
 
@@ -28,7 +29,7 @@ function TeacherBatchMembership() {
       setError('')
 
       const response = await fetch(
-        `http://localhost:5000/api/membership/institutions?search=${encodeURIComponent(search)}`,
+        `${API_BASE_URL}/api/membership/institutions?search=${encodeURIComponent(search)}`,
         {
           headers: {
             Authorization: `Bearer ${token}`
@@ -56,7 +57,7 @@ function TeacherBatchMembership() {
   const fetchMyBatches = async () => {
     try {
       const response = await fetch(
-        'http://localhost:5000/api/membership/teacher/batches',
+        `${API_BASE_URL}/api/membership/teacher/batches`,
         {
           headers: {
             Authorization: `Bearer ${token}`
@@ -106,7 +107,7 @@ function TeacherBatchMembership() {
       setBatchLoading(true)
 
       const response = await fetch(
-        `http://localhost:5000/api/batches/institution/${institution.id}`,
+        `${API_BASE_URL}/api/batches/institution/${institution.id}`,
         {
           headers: {
             Authorization: `Bearer ${token}`
@@ -155,7 +156,7 @@ function TeacherBatchMembership() {
       setSuccess('')
 
       const response = await fetch(
-        'http://localhost:5000/api/membership/teacher/join',
+        `${API_BASE_URL}/api/membership/teacher/join`,
         {
           method: 'POST',
           headers: {
@@ -199,7 +200,7 @@ function TeacherBatchMembership() {
       setSuccess('')
 
       const response = await fetch(
-        'http://localhost:5000/api/membership/teacher/cancel',
+        `${API_BASE_URL}/api/membership/teacher/cancel`,
         {
           method: 'POST',
           headers: {
@@ -246,7 +247,7 @@ function TeacherBatchMembership() {
       setSuccess('')
 
       const response = await fetch(
-        'http://localhost:5000/api/membership/teacher/leave',
+        `${API_BASE_URL}/api/membership/teacher/leave`,
         {
           method: 'POST',
           headers: {
