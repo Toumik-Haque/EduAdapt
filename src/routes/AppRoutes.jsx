@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import ScrollToTop from '../components/ScrollToTop/ScrollToTop'
 
 import Navbar from '../components/Navbar/Navbar'
@@ -27,9 +27,7 @@ import ManageBatches from '../pages/Institute/ManageBatches'
 import ManageTeachers from '../pages/Institute/ManageTeachers'
 import ManageStudents from '../pages/Institute/ManageStudents'
 import BatchDetails from '../pages/Institute/BatchDetails'
-import TestLogo from '../pages/TestLogo/TestLogo'
 import Community from '../pages/Community/Community'
-import FloatingExitTestButton from '../components/FloatingExitTestButton/FloatingExitTestButton'
 
 import ProtectedRoute from './ProtectedRoute'
 import PublicOnlyRoute from './PublicOnlyRoute'
@@ -267,13 +265,12 @@ function AppRoutes() {
             </ProtectedRoute>
           }
         />
+        {/* Legacy /test-logo redirect */}
+        <Route path="/test-logo" element={<Navigate to="/" replace />} />
 
-        {/* Brandmark Test & Showcase */}
-        <Route path="/test-logo" element={<TestLogo />} />
+        {/* 404 Catch-All Route */}
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
-
-      {/* Floating Movable Test Hub & Exit Button (Inside Router Context) */}
-      <FloatingExitTestButton testServerPort={5050} />
     </BrowserRouter>
   )
 }
